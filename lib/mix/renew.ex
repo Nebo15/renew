@@ -425,13 +425,14 @@ defmodule Mix.Tasks.Renew do
 
   # Install Elixir Deps
   ADD mix.* ./
-  RUN MIX_ENV=prod mix local.rebar --force
-  RUN MIX_ENV=prod mix local.hex --force
-  RUN MIX_ENV=prod mix deps.get
+  ENV MIX_ENV=prod
+  RUN mix local.rebar --force
+  RUN mix local.hex --force
+  RUN mix deps.get
 
   # Generate release
   ADD . .
-  RUN MIX_ENV=prod mix release --env=prod
+  RUN mix release --env=prod
 
   # Clean sources, but save migrations for Ecto.Migrator
   RUN if [ -d "priv" ]; then mkdir rel/priv; mv priv/* rel/priv; fi
@@ -450,7 +451,7 @@ defmodule Mix.Tasks.Renew do
   # Runtime config
 
   # Compile assets
-  # RUN MIX_ENV=prod mix phoenix.digest
+  # RUN mix phoenix.digest
 
   # Exposes this port from the docker container to the host machine
   # EXPOSE 4000
