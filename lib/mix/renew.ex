@@ -109,6 +109,10 @@ defmodule Mix.Tasks.Renew do
     create_directory "rel"
     create_file "rel/config.exs", release_config_template(assigns)
 
+    create_directory "rel/hooks"
+    create_file "rel/hooks/pre_run.sh", prerun_text()
+    System.cmd "chmod", ["+x", "rel/hooks/pre_run.sh"]
+
     create_directory "test"
     create_file "test/test_helper.exs", test_helper_template(assigns)
     create_file "test/#{app}_test.exs", test_template(assigns)
@@ -342,6 +346,7 @@ defmodule Mix.Tasks.Renew do
 
   # Ignore released binaries
   rel/*/
+  !rel/hooks/
   """
 
   embed_text :dockerignore, """
@@ -400,6 +405,10 @@ defmodule Mix.Tasks.Renew do
   # This variables will replace any ${VAR_NAME} in your config (eg. config/confix.exs) files.
   """
 
+  embed_text :prerun, """
+  # Add your pre-run scripts here.
+  """
+
   embed_template :dockerfile, """
   # Set the Docker image you want to base your image off.
   # I chose this one because it has Elixir preinstalled.
@@ -424,6 +433,9 @@ defmodule Mix.Tasks.Renew do
   ADD . .
   RUN MIX_ENV=prod mix release --env=prod
 
+  # Save migrations for Ecto.Migrator
+  RUN if [ -d "priv/repo" ]; then mv priv/repo ../rel/repo; fi
+
   # Clean sources
   RUN mv rel ../rel
   RUN rm -rf ./*
@@ -432,8 +444,9 @@ defmodule Mix.Tasks.Renew do
   # Allow to read ENV vars for mix configs
   ENV REPLACE_OS_VARS=true
 
-  # Set entrypoint to run app
-  ENTRYPOINT ["<%= @app %>/bin/<%= @app %>", "start"]
+  # Pre-run hook that allows you to add initialization scripts.
+  # They should be located in rel/hooks directory, rest of project will be removed on build.
+  RUN hooks/pre_run.sh
 
   # Runtime config
 
@@ -444,8 +457,11 @@ defmodule Mix.Tasks.Renew do
   # EXPOSE 4000
 
   # The command to run when this image starts up
-  # CMD MIX_ENV=prod mix ecto.migrate && \
-  #  MIX_ENV=prod mix phoenix.server
+  #  You can run it in one of the following ways:
+  #    Interactive: <%= @app %>/bin/<%= @app %> console
+  #    Foreground: <%= @app %>/bin/<%= @app %> foreground
+  #    Daemon: <%= @app %>/bin/<%= @app %> start
+  CMD ["<%= @app %>/bin/<%= @app %>", "console"]
   """
 
   embed_template :release_config, """

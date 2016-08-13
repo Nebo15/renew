@@ -56,6 +56,12 @@ All this tools supplied with custom configuration.
 
 Take look at [Travis-CI](https://travis-ci.org/). It will make sure that all tests passing on each commit and pull request.
 
+### Migrations
+
+Whenever you make a release for your app you can't use mix anymore, but you still want to be able to run migrations. For this cases we include migrator module. [This post](http://blog.plataformatec.com.br/2016/04/running-migration-in-an-exrm-release/) tells how to run migration without mix.
+
+Your migrations will be preserved within container in `./repo` folder.
+
 ## Installation
 
 Install this package globally:
