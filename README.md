@@ -1,6 +1,6 @@
 # Renew
 
-This module adds ```mix nebo15.new``` task that imports our base folder structure. Usage is very similar to `mix new` except custom enhancements that we used to do.
+This module adds ```mix renew``` task that imports our base folder structure. Usage is very similar to `mix new` except custom enhancements that we used to do.
 
 ## What has changed?
 
@@ -66,10 +66,10 @@ Install this package globally:
 
 ## Usage
 
-You need to use `nebo15.new` task to create new projects:
+You need to use `renew` task to create new projects:
 
   ```
-  mix nebo15.new myapp
+  mix renew myapp
   ```
 
 See [Mix.Tasks.New](http://elixir-lang.org/docs/stable/mix/Mix.Tasks.New.html) for additional documentation.

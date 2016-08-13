@@ -1,4 +1,4 @@
-defmodule Mix.Tasks.Nebo15.New do
+defmodule Mix.Tasks.Renew do
   use Mix.Task
 
   import Mix.Generator
