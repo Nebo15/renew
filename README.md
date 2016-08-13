@@ -58,4 +58,19 @@ Take look at [Travis-CI](https://travis-ci.org/). It will make sure that all tes
 
 ## Installation
 
-**TODO**
+Install this package globally:
+
+  ```
+  mix archive.install https://github.com/Nebo15/renew/releases/download/0.1.0/renew-0.1.0.ez
+  ```
+
+## Usage
+
+You need to use `nebo15.new` task to create new projects:
+
+  ```
+  mix nebo15.new myapp
+  ```
+
+See [Mix.Tasks.New](http://elixir-lang.org/docs/stable/mix/Mix.Tasks.New.html) for additional documentation.
+
