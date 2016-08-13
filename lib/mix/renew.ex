@@ -435,7 +435,7 @@ defmodule Mix.Tasks.Renew do
 
   # Clean sources, but save migrations for Ecto.Migrator
   RUN if [ -d "priv" ]; then mkdir rel/priv; mv priv/* rel/priv; fi
-  RUN find . -maxdepth 1 -not -name "rel" -not -name "." -exec rm -rf {} \;
+  RUN find . -maxdepth 1 -not -name "rel" -not -name "." -exec rm -rf {} \\;
   RUN mv rel/* ./
   RUN rm config.exs
   RUN rm -r rel
