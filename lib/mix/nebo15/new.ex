@@ -88,6 +88,11 @@ defmodule Mix.Tasks.Nebo15.New do
 
     create_directory "config"
     create_file "config/config.exs", config_template(assigns)
+    create_file "config/.credo.exs", credo_text()
+    create_file "config/dogma.exs", dogma_text()
+    create_file "coveralls.json", coveralls_text()
+
+    create_file ".travis.yml", travis_text()
 
     create_directory "lib"
 
@@ -243,6 +248,55 @@ defmodule Mix.Tasks.Nebo15.New do
   <% end %>
   """
 
+  embed_text :credo, """
+  %{
+    configs: [
+      %{
+        name: "default",
+        files: %{
+          included: ["lib/", "www/"]
+        },
+        checks: [
+          {Credo.Check.Design.TagTODO, exit_status: 0}
+        ]
+      }
+    ]
+  }
+  """
+
+  embed_text :dogma, """
+  use Mix.Config
+  alias Dogma.Rule
+
+  config :dogma,
+    rule_set: Dogma.RuleSet.All,
+    override: [
+      %Rule.LineLength{ max_length: 120 },
+      %Rule.TakenName{ enabled: false }, # TODO: https://github.com/lpil/dogma/issues/201
+      %Rule.InfixOperatorPadding{ enabled: false }
+    ]
+  """
+
+  embed_text :travis, """
+  language: elixir
+  elixir:
+    - 1.3.0
+  otp_release:
+    - 18.0
+    - 19.0
+  env:
+    - MIX_ENV=test
+  script:
+    - "mix deps.get"
+    - "mix test --trace"
+    - "mix coveralls.travis"
+    - "mix credo"
+    - "mix dogma"
+  """
+
+  embed_text :coveralls, """
+  {}
+  """
 
   embed_text :license, """
   **TODO: Add license**

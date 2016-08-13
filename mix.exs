@@ -1,32 +1,32 @@
-defmodule Enew.Mixfile do
+defmodule Renew.Mixfile do
   use Mix.Project
 
+  @version "0.1.0"
+
   def project do
-    [app: :enew,
-     version: "0.1.0",
+    [app: :renew,
+     description: "Mix task to create Nebo #15 base mix projects that builds into Docker containers.",
+     package: package,
+     version: @version,
      elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps()]
   end
 
-  # Configuration for the OTP application
-  #
-  # Type "mix help compile.app" for more information
   def application do
     [applications: [:logger]]
   end
 
-  # Dependencies can be Hex packages:
-  #
-  #   {:mydep, "~> 0.3.0"}
-  #
-  # Or git/path repositories:
-  #
-  #   {:mydep, git: "https://github.com/elixir-lang/mydep.git", tag: "0.1.0"}
-  #
-  # Type "mix help deps" for more examples and options
   defp deps do
     []
+  end
+
+  defp package do
+    [contributors: ["Andrew Dryga"],
+     maintainers: ["Andrew Dryga"],
+     licenses: ["MIT"],
+     links: %{github: "https://github.com/Nebo15/renew"},
+     files: ~w(lib LICENSE.md mix.exs README.md)]
   end
 end

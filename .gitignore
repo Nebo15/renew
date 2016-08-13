@@ -16,5 +16,24 @@ erl_crash.dump
 # Also ignore archive artifacts (built via "mix archive.build").
 *.ez
 
+# Don't commit benchmark snapshots
+bench/snapshots
+
+# Don't commit editor configs
+.idea
+*.iws
+/out/
+atlassian-ide-plugin.xml
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+*.sublime-workspace
+sftp-config.json
+GitHub.sublime-settings
+.tags
+.tags_sorted_by_file
+.vagrant
+.DS_Store
+
 # Ignore released binaries
 rel/*/
