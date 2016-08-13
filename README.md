@@ -14,9 +14,9 @@ We trying to have our projects consistent, so some other small changes are made:
 
 The biggest addition is deployment tools that we use.
 
-`mix.exs` will include (Distillery)[https://github.com/bitwalker/distillery] as release management tool. It will be used in `Dockerfile` to build project into a Docker container.
+`mix.exs` will include [Distillery](https://github.com/bitwalker/distillery) as release management tool. It will be used in `Dockerfile` to build project into a Docker container.
 
-`Dockerfile` needs enhancements, so take look in it's source. Usually you need to expose some ports to talk to a container, and change ENTRYPOINT of your application.
+`Dockerfile` needs enhancements, so take look in it's source. Usually you need to expose some ports to talk to a container, and change `ENTRYPOINT` of your application.
 
 There are `./bin/build.sh` script that removes routine in building container for production.
   ```
