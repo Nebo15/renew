@@ -1,6 +1,4 @@
 language: elixir
-# on:
-#   tags: true
 elixir:
   - 1.3.0
 otp_release:
@@ -8,8 +6,12 @@ otp_release:
 env:
   - MIX_ENV=prod ARCHIVE_FILE="renew-${TRAVIS_TAG:-dev}.ez"
 script:
-  - "mix do archive.build -o $ARCHIVE_FILE"
+  - mix do archive.build -o $ARCHIVE_FILE
 deploy:
   provider: releases
+  api_key:
+    secure: WhhWQwCweDByppsdPJlDfjO4ZMrrKFPSGH9TxvwE/meTcMmI8zjAakh5j2ke76IFBbsqtqZXD24YmBAeGHECXnMtBE+86D86GIv9DqKIHcvjMrtm8Yb2niqtay+MubKL2fBTWrmPYCer6jDoH/UMdaB2Dm8ozBM9y0b8YSEKx0+j+wLfihY/7vyLi28u/QWFO4QB2eU0foqkES71BwENYMqgpGLGAmJatxmlny98MeQlNNPSkURR1C7XZgPTE1IBc2DcAi6BkQaJEWlLW2lT4hiJ8a5ArMAKKxs9xcez7RGzkeagb4aPzckDEck8+sjXY+P0JX1nCcxknnSRmTyuRG+qwi7NQOWnF+++C+QJ60mEM4yYJX+Sy1XXHFoRsQQfKLNmX6mMw+rCz7CnqP6woR82WE/Q+aN10wU3iF76kexVmcDLGO/2qpZ0F4+WJ/EYP7AydJrm/mEZKNe3GpF/UAFlmrTucibqhjAl94xcIrSCCrAf7bW8+JOvH3HxRUnUc/WhnXEbtjmP+ck366/Ue0PEk+RwwVEzLJyEH3r+YYKFrxrZb3tZLqaorVmW2EoKVsdfWIgviWCebU4zHC9kiTGMJCD0bIXgCa5TM5PcUFN4SkF60ndd+LGbqaOe3aT3cgMKaIBZyVcMopDFiDUfrzRtzayzelFXQi5M+Of4T7o=
   file: "${ARCHIVE_FILE}"
-  skip_cleanup: true
+  on:
+    repo: Nebo15/renew
+    tags: true
