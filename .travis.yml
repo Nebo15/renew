@@ -8,7 +8,7 @@ otp_release:
 env:
   - MIX_ENV=prod ARCHIVE_FILE="renew-${TRAVIS_TAG:-dev}.ez"
 script:
-  - "mix do archive.build -i $ARCHIVE_FILE"
+  - "mix do archive.build -o $ARCHIVE_FILE"
 deploy:
   provider: releases
   file: "${ARCHIVE_FILE}"
