@@ -1,0 +1,16 @@
+language: elixir
+elixir:
+  - 1.3.0
+otp_release:
+  - 19.0
+env:
+  - MIX_ENV=prod
+  - ARCHIVE_FILE="renew-${TRAVIS_TAG}.ez"
+script:
+  - "mix do archive.build -i $ARCHIVE_FILE"
+deploy:
+  provider: releases
+  file: "${ARCHIVE_FILE}"
+  skip_cleanup: true
+  on:
+    tags: true
