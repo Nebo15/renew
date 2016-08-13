@@ -433,13 +433,12 @@ defmodule Mix.Tasks.Renew do
   ADD . .
   RUN MIX_ENV=prod mix release --env=prod
 
-  # Save migrations for Ecto.Migrator
-  RUN if [ -d "priv/repo" ]; then mv priv/repo ../rel/repo; fi
-
-  # Clean sources
-  RUN mv rel ../rel
-  RUN rm -rf ./*
-  WORKDIR ../rel
+  # Clean sources, but save migrations for Ecto.Migrator
+  RUN if [ -d "priv" ]; then mkdir rel/priv; mv priv/* rel/priv; fi
+  RUN find . -maxdepth 1 -not -name "rel" -not -name "." -exec rm -rf {} \;
+  RUN mv rel/* ./
+  RUN rm config.exs
+  RUN rm -r rel
 
   # Allow to read ENV vars for mix configs
   ENV REPLACE_OS_VARS=true
@@ -461,7 +460,7 @@ defmodule Mix.Tasks.Renew do
   #    Interactive: <%= @app %>/bin/<%= @app %> console
   #    Foreground: <%= @app %>/bin/<%= @app %> foreground
   #    Daemon: <%= @app %>/bin/<%= @app %> start
-  CMD ["<%= @app %>/bin/<%= @app %>", "console"]
+  CMD <%= @app %>/bin/<%= @app %> console
   """
 
   embed_template :release_config, """
