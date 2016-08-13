@@ -80,3 +80,9 @@ You need to use `renew` task to create new projects:
 
 See [Mix.Tasks.New](http://elixir-lang.org/docs/stable/mix/Mix.Tasks.New.html) for additional documentation.
 
+## Useful links
+
+- https://robots.thoughtbot.com/deploying-elixir-to-aws-elastic-beanstalk-with-docker
+- http://blog.plataformatec.com.br/2016/05/how-to-config-environment-variables-with-elixir-and-exrm/
+- https://github.com/bitwalker/distillery/blob/master/docs/Runtime%20Configuration.md
+- [Deploying Elixir and Phoenix applications using Docker and Exrm](https://gist.github.com/)brienw/85db445a0c3976d323b859b1cdccef9a
