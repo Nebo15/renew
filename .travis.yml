@@ -4,7 +4,7 @@ elixir:
 otp_release:
   - 19.0
 env:
-  - MIX_ENV=prod ARCHIVE_FILE="renew-${TRAVIS_TAG:-dev}.ez"
+  - MIX_ENV=prod ARCHIVE_FILE="renew.ez"
 script:
   - mix do archive.build -o $ARCHIVE_FILE
 deploy:

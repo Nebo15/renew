@@ -61,7 +61,7 @@ Take look at [Travis-CI](https://travis-ci.org/). It will make sure that all tes
 Install this package globally:
 
   ```
-  mix archive.install https://github.com/Nebo15/renew/releases/download/0.1.0/renew-0.1.0.ez
+  mix archive.install https://github.com/Nebo15/renew/releases/download/0.2.0/renew.ez
   ```
 
 ## Usage
