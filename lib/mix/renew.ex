@@ -9,7 +9,7 @@ defmodule Mix.Tasks.Renew do
   Creates a new Elixir project.
   It expects the path of the project as argument.
 
-      mix new PATH [--sup] [--module MODULE] [--app APP] [--umbrella]
+      mix renew PATH [--sup] [--module MODULE] [--app APP] [--umbrella]
 
   A project at the given PATH  will be created. The
   application name and module name will be retrieved
@@ -28,21 +28,129 @@ defmodule Mix.Tasks.Renew do
   A `--module` option can be given in order
   to name the modules in the generated code skeleton.
 
+  A `--docker` option can be given in order
+  to add Docker build strategy in the generated code skeleton.
+
+  A `--ci` option can be given in order
+  to add CI tools in the generated code skeleton.
+
+  A `--ecto` option can be given in order
+  to add Ecto in the generated code skeleton.
+
+  A `--phoenix` option can be given in order
+  to add Phoenix Framework in the generated code skeleton.
+
+  A `--amqp` option can be given in order
+  to add Rabbit MQ client (AQMP) in the generated code skeleton.
+
   ## Examples
 
-      mix new hello_world
+      mix renew hello_world
 
   Is equivalent to:
 
-      mix new hello_world --module HelloWorld
+      mix renew hello_world --module HelloWorld
 
   To generate an app with supervisor and application callback:
 
-      mix new hello_world --sup
+      mix renew hello_world --sup
+
+  Recommended usage:
+
+      mix renew hello_world --ci --docker --sup
 
   """
 
-  @switches [sup: :boolean, umbrella: :boolean, app: :string, module: :string]
+  @base [
+    {:cp, "mix/README.md",               "README.md"},
+    {:cp, "mix/LICENSE.md",              "LICENSE.md"},
+    {:cp, "mix/.gitignore",              ".gitignore"},
+    {:cp, "mix/.env",                    ".env"},
+  ]
+
+  @mix [
+    {:cp, "mix/config/config.exs",       "config/config.exs"},
+    {:cp, "mix/mix.exs",                 "mix.exs"},
+    {:cp, "mix/lib/lib.ex",              "lib/<%= @app %>.ex"},
+    {:cp, "mix/test/test_helper.exs",    "test/test_helper.exs"},
+    {:cp, "mix/test/lib_test.exs",       "test/<%= @app %>_test.exs"},
+  ]
+
+  @rel [
+    {:cp, "mix/rel/config.exs",          "rel/config.exs"},
+  ]
+
+  @rel_deps [
+    ~S({:distillery, "~> 0.9"}),
+  ]
+
+  @docker [
+    {:cp, "docker/.dockerignore",        ".dockerignore"},
+    {:cp, "docker/Dockerfile",           "Dockerfile"},
+    {:cp, "docker/bin/build.sh",         "bin/build.sh"},
+    {:cp, "docker/rel/hooks/pre_run.sh", "rel/hooks/pre_run.sh"},
+  ]
+
+  @ci [
+    {:cp, "ci/config/.credo.exs",        "config/.credo.exs"},
+    {:cp, "ci/config/dogma.exs",         "config/dogma.exs"},
+    {:cp, "ci/coveralls.json",           "coveralls.json"},
+    {:cp, "ci/.travis.yml",              ".travis.yml"},
+  ]
+
+  @ci_deps [
+    ~S({:benchfella, "~> 0.3", only: [:dev, :test]}),
+    ~S({:ex_doc, ">= 0.0.0", only: [:dev, :test]}),
+    ~S({:excoveralls, "~> 0.5", only: [:dev, :test]}),
+    ~S({:dogma, "> 0.1.0", only: [:dev, :test]}),
+    ~S({:credo, ">= 0.4.8", only: [:dev, :test]}),
+  ]
+
+  @ci_proj [
+    ~S(test_coverage: [tool: ExCoveralls]),
+    ~S(preferred_cli_env: [coveralls: :test]),
+    ~S(docs: [source_ref: "v#\{@version\}", main: "readme", extras: ["README.md"]]),
+  ]
+
+  @sup [
+    {:cp, "sup/lib/lib.ex",              "lib/<%= @app %>.ex"},
+  ]
+
+  @umbrella @base ++ [
+    {:cp, "umbrella/apps/.gitkeep",      "apps/.gitkeep"},
+    {:cp, "umbrella/config/config.exs",  "config/config.exs"},
+    {:cp, "umbrella/mix.exs",            "mix.exs"},
+  ]
+
+  @umbrella_proj [
+    ~S(build_path: "../../_build"),
+    ~S(config_path: "../../config/config.exs"),
+    ~S(deps_path: "../../deps"),
+    ~S(lockfile: "../../mix.lock"),
+  ]
+
+  @phoenix [
+
+  ]
+
+  @ecto [
+
+  ]
+
+  @amqp [
+
+  ]
+
+  @switches [
+    docker: :boolean,
+    ci: :boolean,
+    sup: :boolean,
+    ecto: :boolean,
+    amqp: :boolean,
+    phoenix: :boolean,
+    umbrella: :boolean,
+    app: :string,
+    module: :string]
 
   @spec run(OptionParser.argv) :: :ok
   def run(argv) do
@@ -50,123 +158,105 @@ defmodule Mix.Tasks.Renew do
 
     case argv do
       [] ->
-        Mix.raise "Expected PATH to be given, please use \"mix new PATH\""
+        Mix.raise ~S(Expected PATH to be given, please use "mix renew PATH")
       [path | _] ->
+
+        # Get module and app names
         app = opts[:app] || Path.basename(Path.expand(path))
         check_application_name!(app, !!opts[:app])
         mod = opts[:module] || Macro.camelize(app)
         check_mod_name_validity!(mod)
         check_mod_name_availability!(mod)
+
+        # Create project path
         File.mkdir_p!(path)
 
-        File.cd! path, fn ->
-          if opts[:umbrella] do
-            generate_umbrella(app, mod, path, opts)
-          else
-            generate(app, mod, path, opts)
-          end
-        end
+        # Assigns for EEx
+        assigns = opts
+        |> Enum.into(%{})
+        |> Map.merge(%{
+            mod: mod,
+            app: app,
+            version: get_version(System.version),
+            apps_prefix: apps_prefix(!!opts[:umbrella]),
+            minor_version: get_minor_version(System.version),
+            otp_app: otp_app(mod, !!opts[:sup]),
+            deps: [],
+            project_settings: [],
+            start_cmd: start_cmd(!!opts[:sup]),
+          })
+
+        # Apply project templates
+        {path, assigns}
+        |> apply_ci_template
+        |> apply_docker_template
+        |> apply_mix_template
+        |> apply_sup_template
+
+        # Print success message
+        !!opts[:umbrella]
+        |> get_success_message
+        |> String.trim_trailing
+        |> Mix.shell.info
     end
   end
 
-  defp generate(app, mod, path, opts) do
-    assigns = [app: app, mod: mod, otp_app: otp_app(mod, !!opts[:sup]),
-               version: get_version(System.version), minor_version: get_minor_version(System.version)]
+  defp apply_mix_template({path, %{umbrella: true} = assigns} = opts) do
+    apply_template @umbrella, path, assigns
+    opts
+  end
 
-    create_file "README.md",     readme_template(assigns)
-    create_file "LICENSE.md",    license_text()
-    create_file ".gitignore",    gitignore_text()
-    create_file ".dockerignore", dockerignore_text()
-    create_file "Dockerfile",    dockerfile_template(assigns)
-    create_file ".env",          dotenv_text()
+  defp apply_mix_template({path, assigns} = opts) do
+    case in_umbrella? do
+      true ->
+        IO.inspect "build in umbrella"
+        assigns = assigns
+        |> add_project_settings(@umbrella_proj)
 
-    if in_umbrella?() do
-      create_file "mix.exs", mixfile_apps_template(assigns)
-    else
-      create_file "mix.exs", mixfile_template(assigns)
+        apply_template @mix, path, assigns
+        opts
+      _ ->
+        IO.inspect "build not in umbrella"
+        assigns = assigns
+        |> add_deps(@rel_deps)
+
+        apply_template @base ++ @rel ++ @mix, path, assigns
+        opts
     end
+  end
 
-    create_directory "config"
-    create_file "config/config.exs", config_template(assigns)
-    create_file "config/.credo.exs", credo_text()
-    create_file "config/dogma.exs", dogma_text()
-    create_file "coveralls.json", coveralls_text()
-
-    create_file ".travis.yml", travis_text()
-
-    create_directory "lib"
-
-    create_directory "bin"
-    create_file "bin/build.sh", build_script_text()
-    System.cmd "chmod", ["+x", "bin/build.sh"]
-
-    if opts[:sup] do
-      create_file "lib/#{app}.ex", lib_sup_template(assigns)
-    else
-      create_file "lib/#{app}.ex", lib_template(assigns)
+  defp apply_sup_template({path, assigns} = opts) do
+    case assigns[:sup] && !assigns[:umbrella] do
+      true ->
+        apply_template @sup, path, assigns, force: true
+        opts
+      _ ->
+        opts
     end
-
-    create_directory "rel"
-    create_file "rel/config.exs", release_config_template(assigns)
-
-    create_directory "rel/hooks"
-    create_file "rel/hooks/pre_run.sh", prerun_text()
-    System.cmd "chmod", ["+x", "rel/hooks/pre_run.sh"]
-
-    create_directory "test"
-    create_file "test/test_helper.exs", test_helper_template(assigns)
-    create_file "test/#{app}_test.exs", test_template(assigns)
-
-    """
-
-    Your Mix project was created successfully.
-    You can use "mix" to compile it, test it, and more:
-
-        cd #{path}
-        mix test
-
-    Run "mix help" for more commands.
-    """
-    |> String.trim_trailing
-    |> Mix.shell.info
   end
 
-  defp otp_app(_mod, false) do
-    "    [applications: [:logger]]"
+  defp apply_docker_template({path, assigns} = opts) do
+    case assigns[:docker] do
+      true ->
+        apply_template @docker, path, assigns, force: true
+        opts
+      _ ->
+        opts
+    end
   end
 
-  defp otp_app(mod, true) do
-    "    [applications: [:logger],\n     mod: {#{mod}, []}]"
-  end
+  defp apply_ci_template({path, assigns}) do
+    case assigns[:ci] do
+      true ->
+        assigns = assigns
+        |> add_deps(@ci_deps)
+        |> add_project_settings(@ci_proj)
 
-  defp generate_umbrella(_app, mod, path, _opts) do
-    assigns = [app: nil, mod: mod]
-
-    create_file ".gitignore", gitignore_text()
-    create_file "README.md", readme_template(assigns)
-    create_file "mix.exs", mixfile_umbrella_template(assigns)
-
-    create_directory "apps"
-
-    create_directory "config"
-    create_file "config/config.exs", config_umbrella_template(assigns)
-
-    """
-
-    Your umbrella project was created successfully.
-    Inside your project, you will find an apps/ directory
-    where you can create and host many apps:
-
-        cd #{path}
-        cd apps
-        mix new my_app
-
-    Commands like "mix compile" and "mix test" when executed
-    in the umbrella project root will automatically run
-    for each application in the apps/ directory.
-    """
-    |> String.trim_trailing
-    |> Mix.shell.info
+        apply_template @ci, path, assigns, force: true
+        {path, assigns}
+      _ ->
+        {path, assigns}
+    end
   end
 
   defp check_application_name!(name, from_app_flag) do
@@ -209,11 +299,72 @@ defmodule Mix.Tasks.Renew do
       end
   end
 
+  defp add_deps(assigns, add) do
+    {_, assigns} = Map.get_and_update(assigns, :deps, fn deps ->
+      {deps, deps ++ add}
+    end)
+
+    assigns
+  end
+
+  defp add_project_settings(assigns, add) do
+    {_, assigns} = Map.get_and_update(assigns, :project_settings, fn project_settings ->
+      {project_settings, project_settings ++ add}
+    end)
+
+    assigns
+  end
+
+  defp apply_template(files, path, assigns, opts \\ []) do
+    root = Path.expand("../../templates", __DIR__)
+
+    # Convert assigns to a list that is required by EEx
+    {_, assigns} = Map.get_and_update(assigns, :deps, fn deps ->
+      {deps, Enum.join(deps, ",\n     ")}
+    end)
+
+    # Convert project settings to a list that is required by EEx
+    {_, assigns} = Map.get_and_update(assigns, :project_settings, fn project_settings ->
+      t = Enum.join(project_settings, ",\n     ")
+      case t do
+        "" ->
+          {project_settings, ""}
+        _ ->
+          {project_settings, ",\n     " <> t}
+      end
+    end)
+
+    assigns_map = Map.to_list(assigns)
+
+    for {format, source, destination} <- files do
+      target = destination
+      |> EEx.eval_string(assigns: assigns_map)
+      |> (&Path.join(path, &1)).()
+
+      template = source
+      |> (&Path.join(root, &1)).()
+      |> File.read!
+      |> EEx.eval_string(assigns: assigns_map)
+
+      case format do
+        :cp ->
+          create_file(target, template, opts)
+      end
+
+      case Path.extname(target) do
+        ".sh" ->
+          System.cmd "chmod", ["+x", target]
+        _ ->
+          :ok
+      end
+    end
+  end
+
   defp in_umbrella? do
-    apps = Path.dirname(File.cwd!)
+    apps = Path.dirname(File.cwd!) <> "/apps"
 
     try do
-      Mix.Project.in_project(:umbrella_check, "../..", fn _ ->
+      Mix.Project.in_project(:umbrella_check, "./..", fn _ ->
         path = Mix.Project.config[:apps_path]
         path && Path.expand(path) == apps
       end)
@@ -222,492 +373,57 @@ defmodule Mix.Tasks.Renew do
     end
   end
 
-  embed_template :readme, """
-  # <%= @mod %>
-
-  **TODO: Add description**
-  <%= if @app do %>
-  ## Installation
-
-  If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
-
-    1. Add `<%= @app %>` to your list of dependencies in `mix.exs`:
-
-      ```elixir
-      def deps do
-        [{:<%= @app %>, "~> 0.1.0"}]
-      end
-      ```
-
-    2. Ensure `<%= @app %>` is started before your application:
-
-      ```elixir
-      def application do
-        [applications: [:<%= @app %>]]
-      end
-      ```
-
-  If [published on HexDocs](https://hex.pm/docs/tasks#hex_docs), the docs can
-  be found at [https://hexdocs.pm/<%= @app %>](https://hexdocs.pm/<%= @app %>)
-  <% end %>
-  """
-
-  embed_text :credo, """
-  %{
-    configs: [
-      %{
-        name: "default",
-        files: %{
-          included: ["lib/", "www/"]
-        },
-        checks: [
-          {Credo.Check.Design.TagTODO, exit_status: 0}
-        ]
-      }
-    ]
-  }
-  """
-
-  embed_text :dogma, """
-  use Mix.Config
-  alias Dogma.Rule
-
-  config :dogma,
-    rule_set: Dogma.RuleSet.All,
-    override: [
-      %Rule.LineLength{ max_length: 120 },
-      %Rule.TakenName{ enabled: false }, # TODO: https://github.com/lpil/dogma/issues/201
-      %Rule.InfixOperatorPadding{ enabled: false }
-    ]
-  """
-
-  embed_text :travis, """
-  language: elixir
-  elixir:
-    - 1.3.0
-  otp_release:
-    - 18.0
-    - 19.0
-  env:
-    - MIX_ENV=test
-  script:
-    - "mix deps.get"
-    - "mix test --trace"
-    - "mix coveralls.travis"
-    - "mix credo"
-    - "mix dogma"
-  """
-
-  embed_text :coveralls, """
-  {}
-  """
-
-  embed_text :license, """
-  **TODO: Add license**
-  """
-
-  embed_text :gitignore, """
-  # The directory Mix will write compiled artifacts to.
-  /_build
-
-  # If you run "mix test --cover", coverage assets end up here.
-  /cover
-
-  # The directory Mix downloads your dependencies sources to.
-  /deps
-
-  # Where 3rd-party dependencies like ExDoc output generated docs.
-  /doc
-
-  # If the VM crashes, it generates a dump, let's ignore it too.
-  erl_crash.dump
-
-  # Also ignore archive artifacts (built via "mix archive.build").
-  *.ez
-
-  # Don't commit benchmark snapshots
-  bench/snapshots
-
-  # Don't commit editor configs
-  .idea
-  *.iws
-  /out/
-  atlassian-ide-plugin.xml
-  *.tmlanguage.cache
-  *.tmPreferences.cache
-  *.stTheme.cache
-  *.sublime-workspace
-  sftp-config.json
-  GitHub.sublime-settings
-  .tags
-  .tags_sorted_by_file
-  .vagrant
-  .DS_Store
-
-  # Ignore released binaries
-  rel/*/
-  !rel/hooks/
-  """
-
-  embed_text :dockerignore, """
-  # The directory Mix will write compiled artifacts to.
-  /_build
-
-  # The directory Mix downloads your dependencies sources to.
-  /deps
-
-  # If you run "mix test --cover", coverage assets end up here.
-  /cover
-
-  # Ignore released binaries
-  /rel/*/
-
-  # If the VM crashes, it generates a dump, let's ignore it too.
-  erl_crash.dump
-
-  # Ignore any node modules, as they should be fetched within container
-  /node_modules
-
-  # Ignore static files
-  /priv/static/*
-
-  # Ignore Phoenix uploads in dev env
-  /uploads/files/*
-
-  # Ignore git artifacts
-  .git
-  .gitignore
-
-  # Ignore Docker artifacts
-  Dockerfile
-  .dockerignore
-
-  # Ignore markdown description
-  README.md
-  LICENSE.md
-  """
-
-  embed_text :build_script, """
-  PROJECT_DIR=$(git rev-parse --show-toplevel)
-  PROJECT_NAME=${PROJECT_DIR##*/}
-
-  echo "[I] Building a Docker container '${PROJECT_NAME}' from path '${PROJECT_DIR}'.."
-
-  docker build -t "${PROJECT_NAME}" -f "${PROJECT_DIR}/Dockerfile" "${PROJECT_DIR}"
-  """
-
-  embed_text :dotenv, """
-  # Define your environment variables here in a FOO="bar" format.
-  #
-  # Later you can use them to start a Docker container:
-  # $ docker run --env-file ./.env [rest]
-  #
-  # This variables will replace any ${VAR_NAME} in your config (eg. config/confix.exs) files.
-  """
-
-  embed_text :prerun, """
-  # Add your pre-run scripts here.
-  """
-
-  embed_template :dockerfile, """
-  # Set the Docker image you want to base your image off.
-  # I chose this one because it has Elixir preinstalled.
-  FROM trenpixster/elixir:<%= @minor_version %>
-
-  # Maintainers
-  MAINTAINER Nebo#15 @nebo15
-
-  # Install other stable dependencies that don't change often
-
-  # Compile app
-  RUN mkdir /app
-  WORKDIR /app
-
-  # Install Elixir Deps
-  ADD mix.* ./
-  ENV MIX_ENV=prod
-  RUN mix local.rebar --force
-  RUN mix local.hex --force
-  RUN mix deps.get
-
-  # Generate release
-  ADD . .
-  RUN mix release --env=prod
-
-  # Clean sources, but save migrations for Ecto.Migrator
-  RUN if [ -d "priv" ]; then mkdir rel/priv; mv priv/* rel/priv; fi
-  RUN find . -maxdepth 1 -not -name "rel" -not -name "." -exec rm -rf {} \\;
-  RUN mv rel/* ./
-  RUN rm config.exs
-  RUN rm -r rel
-
-  # Allow to read ENV vars for mix configs
-  ENV REPLACE_OS_VARS=true
-
-  # Pre-run hook that allows you to add initialization scripts.
-  # They should be located in rel/hooks directory, rest of project will be removed on build.
-  RUN hooks/pre_run.sh
-
-  # Runtime config
-
-  # Compile assets
-  # RUN mix phoenix.digest
-
-  # Exposes this port from the docker container to the host machine
-  # EXPOSE 4000
-
-  # The command to run when this image starts up
-  #  You can run it in one of the following ways:
-  #    Interactive: <%= @app %>/bin/<%= @app %> console
-  #    Foreground: <%= @app %>/bin/<%= @app %> foreground
-  #    Daemon: <%= @app %>/bin/<%= @app %> start
-  CMD <%= @app %>/bin/<%= @app %> console
-  """
-
-  embed_template :release_config, """
-  use Mix.Releases.Config,
-    default_release: :default,
-    default_environment: :prod
-
-  environment :prod do
-    set dev_mode: false
-    set include_erts: false
-    set include_src: false
+  defp otp_app(_mod, false) do
+    "    [applications: [:logger]]"
   end
 
-  release :<%= @app %> do
-    set version: current_version(:<%= @app %>)
+  defp otp_app(mod, true) do
+    "    [applications: [:logger],\n     mod: {#{mod}, []}]"
   end
-  """
 
-  embed_template :mixfile, """
-  defmodule <%= @mod %>.Mixfile do
-    use Mix.Project
-
-    @version "0.1.0"
-
-    def project do
-      [app: :<%= @app %>,
-       description: "Add description to your package.",
-       package: package,
-       version: @version,
-       elixir: "~> <%= @version %>",
-       build_embedded: Mix.env == :prod,
-       start_permanent: Mix.env == :prod,
-       deps: deps(),
-       test_coverage: [tool: ExCoveralls],
-       preferred_cli_env: [coveralls: :test],
-       docs: [source_ref: "v#\{@version\}", main: "readme", extras: ["README.md"]]]
-    end
-
-    # Configuration for the OTP application
-    #
-    # Type "mix help compile.app" for more information
-    def application do
-  <%= @otp_app %>
-    end
-
-    # Dependencies can be Hex packages:
-    #
-    #   {:mydep, "~> 0.3.0"}
-    #
-    # Or git/path repositories:
-    #
-    #   {:mydep, git: "https://github.com/elixir-lang/mydep.git", tag: "0.1.0"}
-    #
-    # Type "mix help deps" for more examples and options
-    defp deps do
-      [{:distillery, "~> 0.9"},
-       {:benchfella, "~> 0.3", only: [:dev, :test]},
-       {:ex_doc, ">= 0.0.0", only: [:dev, :test]},
-       {:excoveralls, "~> 0.5", only: [:dev, :test]},
-       {:dogma, "> 0.1.0", only: [:dev, :test]},
-       {:credo, ">= 0.4.8", only: [:dev, :test]}]
-    end
-
-    defp package do
-      [contributors: ["Nebo #15"],
-       maintainers: ["Nebo #15"],
-       licenses: ["LISENSE.md"],
-       links: %{github: "https://github.com/Nebo15/<%= @app %>"},
-       files: ~w(lib LICENSE.md mix.exs README.md)]
-    end
+  defp start_cmd(false) do
+    "console"
   end
-  """
 
-  embed_template :mixfile_apps, """
-  defmodule <%= @mod %>.Mixfile do
-    use Mix.Project
-
-    def project do
-      [app: :<%= @app %>,
-       version: "0.1.0",
-       build_path: "../../_build",
-       config_path: "../../config/config.exs",
-       deps_path: "../../deps",
-       lockfile: "../../mix.lock",
-       elixir: "~> <%= @version %>",
-       build_embedded: Mix.env == :prod,
-       start_permanent: Mix.env == :prod,
-       deps: deps()]
-    end
-
-    # Configuration for the OTP application
-    #
-    # Type "mix help compile.app" for more information
-    def application do
-  <%= @otp_app %>
-    end
-
-    # Dependencies can be Hex packages:
-    #
-    #   {:mydep, "~> 0.3.0"}
-    #
-    # Or git/path repositories:
-    #
-    #   {:mydep, git: "https://github.com/elixir-lang/mydep.git", tag: "0.1.0"}
-    #
-    # To depend on another app inside the umbrella:
-    #
-    #   {:myapp, in_umbrella: true}
-    #
-    # Type "mix help deps" for more examples and options
-    defp deps do
-      []
-    end
+  defp start_cmd(true) do
+    "start"
   end
-  """
 
-  embed_template :mixfile_umbrella, """
-  defmodule <%= @mod %>.Mixfile do
-    use Mix.Project
-
-    def project do
-      [apps_path: "apps",
-       build_embedded: Mix.env == :prod,
-       start_permanent: Mix.env == :prod,
-       deps: deps()]
-    end
-
-    # Dependencies can be Hex packages:
-    #
-    #   {:mydep, "~> 0.3.0"}
-    #
-    # Or git/path repositories:
-    #
-    #   {:mydep, git: "https://github.com/elixir-lang/mydep.git", tag: "0.1.0"}
-    #
-    # Type "mix help deps" for more examples and options.
-    #
-    # Dependencies listed here are available only for this project
-    # and cannot be accessed from applications inside the apps folder
-    defp deps do
-      [{:distillery, "~> 0.9"},
-       {:benchfella, "~> 0.3", only: [:dev, :test]},
-       {:ex_doc, ">= 0.0.0", only: [:dev, :test]},
-       {:excoveralls, "~> 0.5", only: [:dev, :test]},
-       {:dogma, "> 0.1.0", only: [:dev, :test]},
-       {:credo, ">= 0.4.8", only: [:dev, :test]}]
-    end
+  defp apps_prefix(false) do
+    ""
   end
-  """
 
-  embed_template :config, ~S"""
-  # This file is responsible for configuring your application
-  # and its dependencies with the aid of the Mix.Config module.
-  use Mix.Config
-
-  # This configuration is loaded before any dependency and is restricted
-  # to this project. If another project depends on this project, this
-  # file won't be loaded nor affect the parent project. For this reason,
-  # if you want to provide default values for your application for
-  # 3rd-party users, it should be done in your "mix.exs" file.
-
-  # You can configure for your application as:
-  #
-  #     config :<%= @app %>, key: :value
-  #
-  # And access this configuration in your application as:
-  #
-  #     Application.get_env(:<%= @app %>, :key)
-  #
-  # Or configure a 3rd-party app:
-  #
-  #     config :logger, level: :info
-  #
-  # Or read environment variables in runtime (!) as:
-  #
-  #     :var_name, "${ENV_VAR_NAME}"
-
-  # It is also possible to import configuration files, relative to this
-  # directory. For example, you can emulate configuration per environment
-  # by uncommenting the line below and defining dev.exs, test.exs and such.
-  # Configuration from the imported file will override the ones defined
-  # here (which is why it is important to import them last).
-  #
-  #     import_config "#{Mix.env}.exs"
-  """
-
-  embed_template :config_umbrella, ~S"""
-  # This file is responsible for configuring your application
-  # and its dependencies with the aid of the Mix.Config module.
-  use Mix.Config
-
-  # By default, the umbrella project as well as each child
-  # application will require this configuration file, ensuring
-  # they all use the same configuration. While one could
-  # configure all applications here, we prefer to delegate
-  # back to each application for organization purposes.
-  import_config "../apps/*/config/config.exs"
-
-  # Sample configuration (overrides the imported configuration above):
-  #
-  #     config :logger, :console,
-  #       level: :info,
-  #       format: "$date $time [$level] $metadata$message\n",
-  #       metadata: [:user_id]
-  """
-
-  embed_template :lib, """
-  defmodule <%= @mod %> do
+  defp apps_prefix(true) do
+    "../../"
   end
-  """
 
-  embed_template :lib_sup, """
-  defmodule <%= @mod %> do
-    use Application
+  defp get_success_message(true) do
+    """
 
-    # See http://elixir-lang.org/docs/stable/elixir/Application.html
-    # for more information on OTP Applications
-    def start(_type, _args) do
-      import Supervisor.Spec, warn: false
+    Your umbrella project was created successfully.
+    Inside your project, you will find an apps/ directory
+    where you can create and host many apps:
 
-      # Define workers and child supervisors to be supervised
-      children = [
-        # Starts a worker by calling: <%= @mod %>.Worker.start_link(arg1, arg2, arg3)
-        # worker(<%= @mod %>.Worker, [arg1, arg2, arg3]),
-      ]
+        cd PROJECT_PATH
+        cd apps
+        mix renew my_app
 
-      # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
-      # for other strategies and supported options
-      opts = [strategy: :one_for_one, name: <%= @mod %>.Supervisor]
-      Supervisor.start_link(children, opts)
-    end
+    Commands like "mix compile" and "mix test" when executed
+    in the umbrella project root will automatically run
+    for each application in the apps/ directory.
+    """
   end
-  """
 
-  embed_template :test, """
-  defmodule <%= @mod %>Test do
-    use ExUnit.Case
-    doctest <%= @mod %>
+  defp get_success_message(false) do
+    """
 
-    test "the truth" do
-      assert 1 + 1 == 2
-    end
+    Your Mix project was created successfully.
+    You can use "mix" to compile it, test it, and more:
+
+        cd PROJECT_PATH
+        mix test
+
+    Run "mix help" for more commands.
+    """
   end
-  """
-
-  embed_template :test_helper, """
-  ExUnit.start()
-  """
 end

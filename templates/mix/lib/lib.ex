@@ -1,0 +1,2 @@
+defmodule <%= @mod %> do
+end
