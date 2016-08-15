@@ -130,7 +130,7 @@ defmodule Mix.Tasks.Renew do
   ]
 
   @phoenix [
-
+    {:append, "phoenix/README.md",         "README.md"},
   ]
 
   @ecto [
@@ -138,7 +138,7 @@ defmodule Mix.Tasks.Renew do
     {:cp, "ecto/priv/repo/seeds.exs",           "priv/repo/seeds.exs"},
     {:mkdir, "ecto/priv/repo/migrations/",      "priv/repo/migrations/"},
     {:mkdir, "ecto/test/models/",               "test/models/"},
-    {:cp, "ecto/test/model_case.exs",           "test/model_case.exs"},
+    {:cp, "ecto/test/support/model_case.exs",   "test/support/model_case.exs"},
     {:append, "ecto/config/config.exs",         "config/config.exs"},
   ]
 
