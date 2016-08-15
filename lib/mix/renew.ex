@@ -9,18 +9,22 @@ defmodule Mix.Tasks.Renew do
   Creates a new Elixir project.
   It expects the path of the project as argument.
 
-      mix renew PATH [--sup] [--module MODULE] [--app APP] [--umbrella]
+      mix renew PATH [--module MODULE] [--app APP] [--umbrella | --ecto --aqmp --sup --phoenix] [--ci --docker]
 
-  A project at the given PATH  will be created. The
+  A project at the given PATH will be created. The
   application name and module name will be retrieved
   from the path, unless `--module` or `--app` is given.
+
+  When you run command from `apps/` path withing umbrella application,
+  different project structure will be applied.
 
   A `--sup` option can be given to generate an OTP application
   skeleton including a supervision tree. Normally an app is
   generated without a supervisor and without the app callback.
 
   An `--umbrella` option can be given to generate an
-  umbrella project.
+  umbrella project. When you add this flag `--ecto`, `--sup`,
+  `--amqp`, `--phoenix` options will options be ignored.
 
   An `--app` option can be given in order to
   name the OTP application for the project.
@@ -73,7 +77,7 @@ defmodule Mix.Tasks.Renew do
     {:cp, "mix/mix.exs",                 "mix.exs"},
     {:cp, "mix/lib/lib.ex",              "lib/<%= @app %>.ex"},
     {:cp, "mix/test/test_helper.exs",    "test/test_helper.exs"},
-    {:cp, "mix/test/lib_test.exs",       "test/<%= @app %>_test.exs"},
+    {:cp, "mix/test/unit/lib_test.exs",  "test/unit/<%= @app %>_test.exs"},
   ]
 
   @rel [
@@ -112,12 +116,8 @@ defmodule Mix.Tasks.Renew do
     ~S(docs: [source_ref: "v#\{@version\}", main: "readme", extras: ["README.md"]]),
   ]
 
-  @sup [
-    {:cp, "sup/lib/lib.ex",              "lib/<%= @app %>.ex"},
-  ]
-
   @umbrella @base ++ [
-    {:cp, "umbrella/apps/.gitkeep",      "apps/.gitkeep"},
+    {:mkdir, "apps/",                    "apps/"},
     {:cp, "umbrella/config/config.exs",  "config/config.exs"},
     {:cp, "umbrella/mix.exs",            "mix.exs"},
   ]
@@ -134,7 +134,20 @@ defmodule Mix.Tasks.Renew do
   ]
 
   @ecto [
+    {:cp, "ecto/lib/repo.ex",                   "lib/<%= @app %>/repo.ex"},
+    {:cp, "ecto/priv/repo/seeds.exs",           "priv/repo/seeds.exs"},
+    {:mkdir, "ecto/priv/repo/migrations/",      "priv/repo/migrations/"},
+    {:mkdir, "ecto/test/models/",               "test/models/"},
+    {:cp, "ecto/test/model_case.exs",           "test/model_case.exs"},
+    {:append, "ecto/config/config.exs",         "config/config.exs"},
+  ]
 
+  @ecto_deps [
+    ~S({:ecto, "~> 2.0"}),
+  ]
+
+  @ecto_apps [
+    ~S(:ecto),
   ]
 
   @amqp [
@@ -180,8 +193,9 @@ defmodule Mix.Tasks.Renew do
             version: get_version(System.version),
             apps_prefix: apps_prefix(!!opts[:umbrella]),
             minor_version: get_minor_version(System.version),
-            otp_app: otp_app(mod, !!opts[:sup]),
             deps: [],
+            apps: [],
+            apps_mod: "",
             project_settings: [],
             start_cmd: start_cmd(!!opts[:sup]),
           })
@@ -190,8 +204,10 @@ defmodule Mix.Tasks.Renew do
         {path, assigns}
         |> apply_ci_template
         |> apply_docker_template
-        |> apply_mix_template
         |> apply_sup_template
+        |> apply_ecto_settings
+        |> apply_mix_template
+        |> apply_ecto_template
 
         # Print success message
         !!opts[:umbrella]
@@ -209,14 +225,12 @@ defmodule Mix.Tasks.Renew do
   defp apply_mix_template({path, assigns} = opts) do
     case in_umbrella? do
       true ->
-        IO.inspect "build in umbrella"
         assigns = assigns
         |> add_project_settings(@umbrella_proj)
 
         apply_template @mix, path, assigns
-        opts
+        {path, assigns}
       _ ->
-        IO.inspect "build not in umbrella"
         assigns = assigns
         |> add_deps(@rel_deps)
 
@@ -228,8 +242,10 @@ defmodule Mix.Tasks.Renew do
   defp apply_sup_template({path, assigns} = opts) do
     case assigns[:sup] && !assigns[:umbrella] do
       true ->
-        apply_template @sup, path, assigns, force: true
-        opts
+        assigns = assigns
+        |> set_project_mod({assigns[:mod], "[]"})
+
+        {path, assigns}
       _ ->
         opts
     end
@@ -238,7 +254,7 @@ defmodule Mix.Tasks.Renew do
   defp apply_docker_template({path, assigns} = opts) do
     case assigns[:docker] do
       true ->
-        apply_template @docker, path, assigns, force: true
+        apply_template @docker, path, assigns
         opts
       _ ->
         opts
@@ -252,7 +268,30 @@ defmodule Mix.Tasks.Renew do
         |> add_deps(@ci_deps)
         |> add_project_settings(@ci_proj)
 
-        apply_template @ci, path, assigns, force: true
+        apply_template @ci, path, assigns
+        {path, assigns}
+      _ ->
+        {path, assigns}
+    end
+  end
+
+  defp apply_ecto_settings({path, assigns}) do
+    case assigns[:ecto] && !assigns[:umbrella] do
+      true ->
+        assigns = assigns
+        |> add_deps(@ecto_deps)
+        |> add_project_apps(@ecto_apps)
+
+        {path, assigns}
+      _ ->
+        {path, assigns}
+    end
+  end
+
+  defp apply_ecto_template({path, assigns}) do
+    case assigns[:ecto] && !assigns[:umbrella] do
+      true ->
+        apply_template @ecto, path, assigns
         {path, assigns}
       _ ->
         {path, assigns}
@@ -315,6 +354,22 @@ defmodule Mix.Tasks.Renew do
     assigns
   end
 
+  defp add_project_apps(assigns, add) do
+    {_, assigns} = Map.get_and_update(assigns, :apps, fn apps ->
+      {apps, apps ++ add}
+    end)
+
+    assigns
+  end
+
+  defp set_project_mod(assigns, {module, params}) do
+    {_, assigns} = Map.get_and_update(assigns, :apps_mod, fn apps_mod ->
+      {apps_mod, ",\n     mod: {#{module}, #{params}}"}
+    end)
+
+    assigns
+  end
+
   defp apply_template(files, path, assigns, opts \\ []) do
     root = Path.expand("../../templates", __DIR__)
 
@@ -334,6 +389,16 @@ defmodule Mix.Tasks.Renew do
       end
     end)
 
+    # Convert depending applications to a list that is required by EEx
+    {_, assigns} = Map.get_and_update(assigns, :apps, fn apps ->
+      case apps do
+        [] ->
+          {apps, ""}
+        _ ->
+          {apps, ", " <> Enum.join(apps, ", ")}
+      end
+    end)
+
     assigns_map = Map.to_list(assigns)
 
     for {format, source, destination} <- files do
@@ -341,14 +406,23 @@ defmodule Mix.Tasks.Renew do
       |> EEx.eval_string(assigns: assigns_map)
       |> (&Path.join(path, &1)).()
 
-      template = source
-      |> (&Path.join(root, &1)).()
-      |> File.read!
-      |> EEx.eval_string(assigns: assigns_map)
-
       case format do
         :cp ->
+          template = source
+          |> (&Path.join(root, &1)).()
+          |> File.read!
+          |> EEx.eval_string(assigns: assigns_map)
+
           create_file(target, template, opts)
+        :append ->
+          template = source
+          |> (&Path.join(root, &1)).()
+          |> File.read!
+          |> EEx.eval_string(assigns: assigns_map)
+
+          File.write!(target, File.read!(target) <> template)
+        :mkdir ->
+          File.mkdir_p!(target)
       end
 
       case Path.extname(target) do
@@ -371,14 +445,6 @@ defmodule Mix.Tasks.Renew do
     catch
       _, _ -> false
     end
-  end
-
-  defp otp_app(_mod, false) do
-    "    [applications: [:logger]]"
-  end
-
-  defp otp_app(mod, true) do
-    "    [applications: [:logger],\n     mod: {#{mod}, []}]"
   end
 
   defp start_cmd(false) do

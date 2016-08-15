@@ -18,7 +18,7 @@ defmodule <%= @mod %>.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-<%= @otp_app %>
+    [applications: [:logger<%= @apps %>]<%= @apps_mod %>]
   end
 
   # Dependencies can be Hex packages:
