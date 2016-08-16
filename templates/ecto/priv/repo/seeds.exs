@@ -5,7 +5,7 @@
 # Inside the script, you can read and write to any of your
 # repositories directly:
 #
-#     <%= @mod %>.Repo.insert!(%<%= @mod %>.SomeModel{})
+#     <%= @module_name %>.Repo.insert!(%<%= @module_name %>.SomeModel{})
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will halt execution if something goes wrong.

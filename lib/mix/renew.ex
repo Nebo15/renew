@@ -1,8 +1,6 @@
 defmodule Mix.Tasks.Renew do
   use Mix.Task
 
-  import Mix.Generator
-
   @shortdoc "Creates a new Elixir project based on Nebo #15 requirements."
 
   @moduledoc """
@@ -41,6 +39,9 @@ defmodule Mix.Tasks.Renew do
   A `--ecto` option can be given in order
   to add Ecto in the generated code skeleton.
 
+  `--ecto-db` - specify the database adapter for ecto.
+  Values can be `postgres`, `mysql`. Defaults to `postgres`.
+
   A `--phoenix` option can be given in order
   to add Phoenix Framework in the generated code skeleton.
 
@@ -65,93 +66,11 @@ defmodule Mix.Tasks.Renew do
 
   """
 
-  @base [
-    {:cp, "mix/README.md",               "README.md"},
-    {:cp, "mix/LICENSE.md",              "LICENSE.md"},
-    {:cp, "mix/.gitignore",              ".gitignore"},
-    {:cp, "mix/.env",                    ".env"},
-  ]
-
-  @mix [
-    {:cp, "mix/config/config.exs",       "config/config.exs"},
-    {:cp, "mix/mix.exs",                 "mix.exs"},
-    {:cp, "mix/lib/lib.ex",              "lib/<%= @app %>.ex"},
-    {:cp, "mix/test/test_helper.exs",    "test/test_helper.exs"},
-    {:cp, "mix/test/unit/lib_test.exs",  "test/unit/<%= @app %>_test.exs"},
-  ]
-
-  @rel [
-    {:cp, "mix/rel/config.exs",          "rel/config.exs"},
-  ]
-
-  @rel_deps [
-    ~S({:distillery, "~> 0.9"}),
-  ]
-
-  @docker [
-    {:cp, "docker/.dockerignore",        ".dockerignore"},
-    {:cp, "docker/Dockerfile",           "Dockerfile"},
-    {:cp, "docker/bin/build.sh",         "bin/build.sh"},
-    {:cp, "docker/rel/hooks/pre_run.sh", "rel/hooks/pre_run.sh"},
-  ]
-
-  @ci [
-    {:cp, "ci/config/.credo.exs",        "config/.credo.exs"},
-    {:cp, "ci/config/dogma.exs",         "config/dogma.exs"},
-    {:cp, "ci/coveralls.json",           "coveralls.json"},
-    {:cp, "ci/.travis.yml",              ".travis.yml"},
-  ]
-
-  @ci_deps [
-    ~S({:benchfella, "~> 0.3", only: [:dev, :test]}),
-    ~S({:ex_doc, ">= 0.0.0", only: [:dev, :test]}),
-    ~S({:excoveralls, "~> 0.5", only: [:dev, :test]}),
-    ~S({:dogma, "> 0.1.0", only: [:dev, :test]}),
-    ~S({:credo, ">= 0.4.8", only: [:dev, :test]}),
-  ]
-
-  @ci_proj [
-    ~S(test_coverage: [tool: ExCoveralls]),
-    ~S(preferred_cli_env: [coveralls: :test]),
-    ~S(docs: [source_ref: "v#\{@version\}", main: "readme", extras: ["README.md"]]),
-  ]
-
-  @umbrella @base ++ [
-    {:mkdir, "apps/",                    "apps/"},
-    {:cp, "umbrella/config/config.exs",  "config/config.exs"},
-    {:cp, "umbrella/mix.exs",            "mix.exs"},
-  ]
-
-  @umbrella_proj [
-    ~S(build_path: "../../_build"),
-    ~S(config_path: "../../config/config.exs"),
-    ~S(deps_path: "../../deps"),
-    ~S(lockfile: "../../mix.lock"),
-  ]
-
-  @phoenix [
-    {:append, "phoenix/README.md",         "README.md"},
-  ]
-
-  @ecto [
-    {:cp, "ecto/lib/repo.ex",                   "lib/<%= @app %>/repo.ex"},
-    {:cp, "ecto/priv/repo/seeds.exs",           "priv/repo/seeds.exs"},
-    {:mkdir, "ecto/priv/repo/migrations/",      "priv/repo/migrations/"},
-    {:mkdir, "ecto/test/models/",               "test/models/"},
-    {:cp, "ecto/test/support/model_case.exs",   "test/support/model_case.exs"},
-    {:append, "ecto/config/config.exs",         "config/config.exs"},
-  ]
-
-  @ecto_deps [
-    ~S({:ecto, "~> 2.0"}),
-  ]
-
-  @ecto_apps [
-    ~S(:ecto),
-  ]
-
-  @amqp [
-
+  @generator_plugins [
+    Renew.Generators.Supervisor,
+    Renew.Generators.Ecto,
+    Renew.Generators.Docker,
+    Renew.Generators.CI,
   ]
 
   @switches [
@@ -159,6 +78,7 @@ defmodule Mix.Tasks.Renew do
     ci: :boolean,
     sup: :boolean,
     ecto: :boolean,
+    ecto_db: :string,
     amqp: :boolean,
     phoenix: :boolean,
     umbrella: :boolean,
@@ -169,17 +89,29 @@ defmodule Mix.Tasks.Renew do
   def run(argv) do
     {opts, argv} = OptionParser.parse!(argv, strict: @switches)
 
+    # Normalize opts structure
+    opts = [
+      docker: opts[:docker] || false,
+      ci: opts[:ci] || false,
+      sup: opts[:phoenix] || opts[:sup] || false, # Phoenix requires supervisor
+      ecto: opts[:ecto] || false,
+      amqp: opts[:amqp] || false,
+      ecto_db: opts[:ecto_db] || "postgres",
+      phoenix: opts[:phoenix] || false,
+      umbrella: opts[:umbrella] || false
+    ]
+
     case argv do
       [] ->
         Mix.raise ~S(Expected PATH to be given, please use "mix renew PATH")
       [path | _] ->
-
         # Get module and app names
         app = opts[:app] || Path.basename(Path.expand(path))
         check_application_name!(app, !!opts[:app])
         mod = opts[:module] || Macro.camelize(app)
-        check_mod_name_validity!(mod)
-        check_mod_name_availability!(mod)
+        check_module_name_validity!(mod)
+        check_module_name_availability!(mod)
+        check_directory_existence!(app)
 
         # Create project path
         File.mkdir_p!(path)
@@ -188,139 +120,85 @@ defmodule Mix.Tasks.Renew do
         assigns = opts
         |> Enum.into(%{})
         |> Map.merge(%{
-            mod: mod,
-            app: app,
-            version: get_version(System.version),
-            apps_prefix: apps_prefix(!!opts[:umbrella]),
-            minor_version: get_minor_version(System.version),
-            deps: [],
-            apps: [],
-            apps_mod: "",
+            module_name: mod,
+            application_name: app,
+            in_umbrella: in_umbrella?(path),
+            elixir_version: get_version(System.version),
+            elixir_minor_version: get_minor_version(System.version),
+            project_dependencies: [],
+            project_applications: [],
+            project_start_module: "",
             project_settings: [],
-            start_cmd: start_cmd(!!opts[:sup]),
+            project_compilers: [],
+            config: "",
+            config_test: "",
+            config_dev: "",
+            config_prod: "",
           })
+
+        gens = @generator_plugins
+        |> Enum.filter(fn module -> apply(module, :apply?, [assigns]) end)
+
+        # Print begin message
+        get_begin_message(assigns)
+        |> Mix.shell.info
 
         # Apply project templates
         {path, assigns}
-        |> apply_ci_template
-        |> apply_docker_template
-        |> apply_sup_template
-        |> apply_ecto_settings
-        |> apply_mix_template
-        |> apply_ecto_template
+        |> Renew.Generators.Mix.apply_settings
+        |> (&apply_generators_settings(gens, &1)).()
+        |> Renew.Generators.Mix.apply_template
+        |> (&apply_generators_templates(gens, &1)).()
 
         # Print success message
         !!opts[:umbrella]
-        |> get_success_message
+        |> get_success_message(app)
         |> String.trim_trailing
         |> Mix.shell.info
     end
   end
 
-  defp apply_mix_template({path, %{umbrella: true} = assigns} = opts) do
-    apply_template @umbrella, path, assigns
-    opts
+  defp apply_generators_settings(generators, {path, assigns}) do
+    generators
+    |> Enum.reduce({path, assigns}, fn module, acc -> apply(module, :apply_settings, [acc]) end)
   end
 
-  defp apply_mix_template({path, assigns} = opts) do
-    case in_umbrella? do
-      true ->
-        assigns = assigns
-        |> add_project_settings(@umbrella_proj)
-
-        apply_template @mix, path, assigns
-        {path, assigns}
-      _ ->
-        assigns = assigns
-        |> add_deps(@rel_deps)
-
-        apply_template @base ++ @rel ++ @mix, path, assigns
-        opts
-    end
-  end
-
-  defp apply_sup_template({path, assigns} = opts) do
-    case assigns[:sup] && !assigns[:umbrella] do
-      true ->
-        assigns = assigns
-        |> set_project_mod({assigns[:mod], "[]"})
-
-        {path, assigns}
-      _ ->
-        opts
-    end
-  end
-
-  defp apply_docker_template({path, assigns} = opts) do
-    case assigns[:docker] do
-      true ->
-        apply_template @docker, path, assigns
-        opts
-      _ ->
-        opts
-    end
-  end
-
-  defp apply_ci_template({path, assigns}) do
-    case assigns[:ci] do
-      true ->
-        assigns = assigns
-        |> add_deps(@ci_deps)
-        |> add_project_settings(@ci_proj)
-
-        apply_template @ci, path, assigns
-        {path, assigns}
-      _ ->
-        {path, assigns}
-    end
-  end
-
-  defp apply_ecto_settings({path, assigns}) do
-    case assigns[:ecto] && !assigns[:umbrella] do
-      true ->
-        assigns = assigns
-        |> add_deps(@ecto_deps)
-        |> add_project_apps(@ecto_apps)
-
-        {path, assigns}
-      _ ->
-        {path, assigns}
-    end
-  end
-
-  defp apply_ecto_template({path, assigns}) do
-    case assigns[:ecto] && !assigns[:umbrella] do
-      true ->
-        apply_template @ecto, path, assigns
-        {path, assigns}
-      _ ->
-        {path, assigns}
-    end
+  defp apply_generators_templates(generators, {path, assigns}) do
+    generators
+    |> Enum.reduce({path, assigns}, fn module, acc -> apply(module, :apply_template, [acc]) end)
   end
 
   defp check_application_name!(name, from_app_flag) do
     unless name =~ ~r/^[a-z][\w_]*$/ do
+      extra =
+        if !from_app_flag do
+          ". The application name is inferred from the path, if you'd like to " <>
+          "explicitly name the application then use the `--app APP` option."
+        else
+          ""
+        end
+
       Mix.raise "Application name must start with a letter and have only lowercase " <>
-                "letters, numbers and underscore, got: #{inspect name}" <>
-                (if !from_app_flag do
-                  ". The application name is inferred from the path, if you'd like to " <>
-                  "explicitly name the application then use the \"--app APP\" option."
-                else
-                  ""
-                end)
+                "letters, numbers and underscore, got: #{inspect name}" <> extra
     end
   end
 
-  defp check_mod_name_validity!(name) do
+  defp check_module_name_validity!(name) do
     unless name =~ ~r/^[A-Z]\w*(\.[A-Z]\w*)*$/ do
       Mix.raise "Module name must be a valid Elixir alias (for example: Foo.Bar), got: #{inspect name}"
     end
   end
 
-  defp check_mod_name_availability!(name) do
+  defp check_module_name_availability!(name) do
     name = Module.concat(Elixir, name)
     if Code.ensure_loaded?(name) do
       Mix.raise "Module name #{inspect name} is already taken, please choose another name"
+    end
+  end
+
+  def check_directory_existence!(name) do
+    if File.dir?(name) && !Mix.shell.yes?("The directory #{name} already exists. Are you sure you want to continue?") do
+      Mix.raise "Please select another directory for installation."
     end
   end
 
@@ -338,139 +216,58 @@ defmodule Mix.Tasks.Renew do
       end
   end
 
-  defp add_deps(assigns, add) do
-    {_, assigns} = Map.get_and_update(assigns, :deps, fn deps ->
-      {deps, deps ++ add}
-    end)
-
-    assigns
-  end
-
-  defp add_project_settings(assigns, add) do
-    {_, assigns} = Map.get_and_update(assigns, :project_settings, fn project_settings ->
-      {project_settings, project_settings ++ add}
-    end)
-
-    assigns
-  end
-
-  defp add_project_apps(assigns, add) do
-    {_, assigns} = Map.get_and_update(assigns, :apps, fn apps ->
-      {apps, apps ++ add}
-    end)
-
-    assigns
-  end
-
-  defp set_project_mod(assigns, {module, params}) do
-    {_, assigns} = Map.get_and_update(assigns, :apps_mod, fn apps_mod ->
-      {apps_mod, ",\n     mod: {#{module}, #{params}}"}
-    end)
-
-    assigns
-  end
-
-  defp apply_template(files, path, assigns, opts \\ []) do
-    root = Path.expand("../../templates", __DIR__)
-
-    # Convert assigns to a list that is required by EEx
-    {_, assigns} = Map.get_and_update(assigns, :deps, fn deps ->
-      {deps, Enum.join(deps, ",\n     ")}
-    end)
-
-    # Convert project settings to a list that is required by EEx
-    {_, assigns} = Map.get_and_update(assigns, :project_settings, fn project_settings ->
-      t = Enum.join(project_settings, ",\n     ")
-      case t do
-        "" ->
-          {project_settings, ""}
-        _ ->
-          {project_settings, ",\n     " <> t}
-      end
-    end)
-
-    # Convert depending applications to a list that is required by EEx
-    {_, assigns} = Map.get_and_update(assigns, :apps, fn apps ->
-      case apps do
-        [] ->
-          {apps, ""}
-        _ ->
-          {apps, ", " <> Enum.join(apps, ", ")}
-      end
-    end)
-
-    assigns_map = Map.to_list(assigns)
-
-    for {format, source, destination} <- files do
-      target = destination
-      |> EEx.eval_string(assigns: assigns_map)
-      |> (&Path.join(path, &1)).()
-
-      case format do
-        :cp ->
-          template = source
-          |> (&Path.join(root, &1)).()
-          |> File.read!
-          |> EEx.eval_string(assigns: assigns_map)
-
-          create_file(target, template, opts)
-        :append ->
-          template = source
-          |> (&Path.join(root, &1)).()
-          |> File.read!
-          |> EEx.eval_string(assigns: assigns_map)
-
-          File.write!(target, File.read!(target) <> template)
-        :mkdir ->
-          File.mkdir_p!(target)
-      end
-
-      case Path.extname(target) do
-        ".sh" ->
-          System.cmd "chmod", ["+x", target]
-        _ ->
-          :ok
-      end
-    end
-  end
-
-  defp in_umbrella? do
-    apps = Path.dirname(File.cwd!) <> "/apps"
-
+  defp in_umbrella?(app_path) do
     try do
-      Mix.Project.in_project(:umbrella_check, "./..", fn _ ->
-        path = Mix.Project.config[:apps_path]
-        path && Path.expand(path) == apps
-      end)
+      umbrella = Path.expand(Path.join [app_path, "..", ".."]) # TODO debug
+      File.exists?(Path.join(umbrella, "mix.exs")) &&
+        Mix.Project.in_project(:umbrella_check, umbrella, fn _ ->
+          path = Mix.Project.config[:apps_path]
+          path && Path.expand(path) == Path.join(umbrella, "apps")
+        end)
     catch
       _, _ -> false
     end
   end
 
-  defp start_cmd(false) do
-    "console"
+  defp get_begin_message(%{umbrella: true} = opts) do
+    """
+    Starting generation of Elixir umbrella project..
+
+    Your settings will include:
+      - Distillery release manager<%= if @ci do %>
+      - Code Coverage, Analysis and Benchmarking tools
+      - Setup for Travis-CI Continuous Integration<% end %><%= if @docker do %>
+      - Docker container build config and scripts<% end %>
+    """
+    |> EEx.eval_string(assigns: Enum.to_list(opts))
   end
 
-  defp start_cmd(true) do
-    "start"
+  defp get_begin_message(opts) do
+    """
+    Starting generation of Elixir project..
+
+    Your settings will include:
+      - Distillery release manager<%= if @in_umbrella do %>
+      - Parent umbrella application bindings<% end %><%= if @sup do %>
+      - Application supervisor<% end %><%= if @ecto do %>
+      - Ecto database wrapper with <%= @ecto_db %> adapter.<% end %><%= if @phoenix do %>
+      - Phoenix framework<% end %><%= if @amqp do %>
+      - AQMP RabbitMQ wrapper<% end %><%= if @ci do %>
+      - Code Coverage, Analysis and Benchmarking tools
+      - Setup for Travis-CI Continuous Integration<% end %><%= if @docker do %>
+      - Docker container build config and scripts<% end %>
+    """
+    |> EEx.eval_string(assigns: Enum.to_list(opts))
   end
 
-  defp apps_prefix(false) do
-    ""
-  end
-
-  defp apps_prefix(true) do
-    "../../"
-  end
-
-  defp get_success_message(true) do
+  defp get_success_message(true, application_name) do
     """
 
     Your umbrella project was created successfully.
     Inside your project, you will find an apps/ directory
     where you can create and host many apps:
 
-        cd PROJECT_PATH
+        cd #{application_name}
         cd apps
         mix renew my_app
 
@@ -480,13 +277,13 @@ defmodule Mix.Tasks.Renew do
     """
   end
 
-  defp get_success_message(false) do
+  defp get_success_message(false, application_name) do
     """
 
     Your Mix project was created successfully.
     You can use "mix" to compile it, test it, and more:
 
-        cd PROJECT_PATH
+        cd #{application_name}
         mix test
 
     Run "mix help" for more commands.

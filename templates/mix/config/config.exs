@@ -10,11 +10,11 @@ use Mix.Config
 
 # You can configure for your application as:
 #
-#     config :<%= @app %>, key: :value
+#     config :<%= @application_name %>, key: :value
 #
 # And access this configuration in your application as:
 #
-#     Application.get_env(:<%= @app %>, :key)
+#     Application.get_env(:<%= @application_name %>, :key)
 #
 # Or configure a 3rd-party app:
 #
@@ -23,6 +23,7 @@ use Mix.Config
 # Or read environment variables in runtime (!) as:
 #
 #     :var_name, "${ENV_VAR_NAME}"
+<%= @config %>
 
 # It is also possible to import configuration files, relative to this
 # directory. For example, you can emulate configuration per environment
@@ -30,5 +31,4 @@ use Mix.Config
 # Configuration from the imported file will override the ones defined
 # here (which is why it is important to import them last).
 #
-#     import_config "#{Mix.env}.exs"
-
+import_config "#{Mix.env}.exs"

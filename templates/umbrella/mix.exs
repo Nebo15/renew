@@ -1,4 +1,4 @@
-defmodule <%= @mod %>.Mixfile do
+defmodule <%= @module_name %>.Mixfile do
   use Mix.Project
 
   def project do
@@ -21,6 +21,6 @@ defmodule <%= @mod %>.Mixfile do
   # Dependencies listed here are available only for this project
   # and cannot be accessed from applications inside the apps folder
   defp deps do
-    [<%= @deps %>]
+    [<%= @project_dependencies %>]
   end
 end

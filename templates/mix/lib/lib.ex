@@ -1,4 +1,4 @@
-defmodule <%= @mod %> do
+defmodule <%= @module_name %> do
   <%= if @sup do %>use Application
 
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
@@ -9,14 +9,14 @@ defmodule <%= @mod %> do
     # Define workers and child supervisors to be supervised
     children = [<%= if @ecto do %>
       # Ecto child supervisor
-      supervisor(<%= @mod %>.Repo, [])<% end %>
-      # Starts a worker by calling: <%= @mod %>.Worker.start_link(arg1, arg2, arg3)
-      # worker(<%= @mod %>.Worker, [arg1, arg2, arg3]),
+      supervisor(<%= @module_name %>.Repo, [])<% end %>
+      # Starts a worker by calling: <%= @module_name %>.Worker.start_link(arg1, arg2, arg3)
+      # worker(<%= @module_name %>.Worker, [arg1, arg2, arg3]),
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
     # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: <%= @mod %>.Supervisor]
+    opts = [strategy: :one_for_one, name: <%= @module_name %>.Supervisor]
     Supervisor.start_link(children, opts)
   end<% end %>
 end

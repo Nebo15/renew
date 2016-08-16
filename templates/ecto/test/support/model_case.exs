@@ -1,4 +1,4 @@
-defmodule <%= @mod %>.ModelCase do
+defmodule <%= @module_name %>.ModelCase do
   @moduledoc """
   This module defines the test case to be used by
   model tests.
@@ -14,20 +14,20 @@ defmodule <%= @mod %>.ModelCase do
 
   using do
     quote do
-      alias <%= @mod %>.Repo
+      alias <%= @module_name %>.Repo
 
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
-      import <%= @mod %>.ModelCase
+      import <%= @module_name %>.ModelCase
     end
   end
 
   setup tags do
-    <%= #adapter_config[:test_setup] %>
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(<%= @module_name %>.Repo)
 
     unless tags[:async] do
-      <%= #adapter_config[:test_async] %>
+      Ecto.Adapters.SQL.Sandbox.mode(<%= @module_name %>.Repo, {:shared, self()})
     end
 
     :ok
@@ -45,7 +45,7 @@ defmodule <%= @mod %>.ModelCase do
   """
   def errors_on(struct, data) do
     struct.__struct__.changeset(struct, data)
-    |> Ecto.Changeset.traverse_errors(&<%= @mod %>.ErrorHelpers.translate_error/1)
+    |> Ecto.Changeset.traverse_errors(&<%= @module_name %>.ErrorHelpers.translate_error/1)
     |> Enum.flat_map(fn {key, errors} -> for msg <- errors, do: {key, msg} end)
   end
 end

@@ -1,6 +1,6 @@
 # Set the Docker image you want to base your image off.
 # I chose this one because it has Elixir preinstalled.
-FROM trenpixster/elixir:<%= @minor_version %>
+FROM trenpixster/elixir:<%= @elixir_minor_version %>
 
 # Maintainers
 MAINTAINER Nebo#15 @nebo15
@@ -39,11 +39,11 @@ RUN hooks/pre_run.sh
 # Runtime config
 
 # Exposes this port from the docker container to the host machine
-<%= if !@sup do %># <% end %>EXPOSE 4000
+<%= if !@phoenix do %># <% end %>EXPOSE 4000
 
 # The command to run when this image starts up
 #  You can run it in one of the following ways:
-#    Interactive: <%= @app %>/bin/<%= @app %> console
-#    Foreground: <%= @app %>/bin/<%= @app %> foreground
-#    Daemon: <%= @app %>/bin/<%= @app %> start
-CMD <%= @app %>/bin/<%= @app %> <%= @start_cmd %>
+#    Interactive: <%= @application_name %>/bin/<%= @application_name %> console
+#    Foreground: <%= @application_name %>/bin/<%= @application_name %> foreground
+#    Daemon: <%= @application_name %>/bin/<%= @application_name %> start
+CMD <%= @application_name %>/bin/<%= @application_name %> <%= if @sup || @phoenix do %>start<% else %>console<% end %>
