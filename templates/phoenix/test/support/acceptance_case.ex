@@ -8,9 +8,9 @@ defmodule <%= @module_name %>.AcceptanceCase do
   use ExUnit.CaseTemplate
 
   using do
-    quote do
+    quote do<%= if @ecto do %>
       import Ecto.Model
-      import Ecto.Query, only: [from: 2]
+      import Ecto.Query, only: [from: 2]<% end %>
       import <%= @module_name %>.Router.Helpers
 
       alias <%= @module_name %>.Repo
@@ -43,14 +43,7 @@ defmodule <%= @module_name %>.AcceptanceCase do
       :ok = Ecto.Adapters.SQL.Sandbox.checkout(<%= @module_name %>.Repo)
     end
     <% else %>
-    _ = tags
-    <% end %>
+    _ = tags<% end %>
     :ok
   end
-
-  # defp send(conn) do
-  #   conn
-  #   |> put_private(:plug_skip_csrf_protection, true)
-  #   |> @endpoint.call([])
-  # end
 end

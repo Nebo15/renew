@@ -36,8 +36,7 @@ defmodule <%= @module_name %>.ConnCase do
     unless tags[:async] do
       Ecto.Adapters.SQL.Sandbox.mode(<%= @module_name %>.Repo, {:shared, self()})
     end<% else %>
-    _ = tags
-    <% end %>
+    _ = tags<% end %>
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
 end

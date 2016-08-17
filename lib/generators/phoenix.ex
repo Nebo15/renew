@@ -13,7 +13,6 @@ defmodule Renew.Generators.Phoenix do
     {:cp, "phoenix/web/web.ex",                        "web/web.ex"},
     {:cp, "phoenix/web/views/error_view.ex",           "web/views/error_view.ex"},
     {:cp, "phoenix/web/views/page_view.ex",            "web/views/page_view.ex"},
-    {:cp, "phoenix/web/views/layout_view.ex",          "web/views/layout_view.ex"},
     {:cp, "phoenix/web/controllers/page_controller.ex",             "web/controllers/page_controller.ex"},
     {:cp, "phoenix/test/acceptance/initial_gate/page_test.exs",     "test/acceptance/intial_gate/page_test.exs"},
     {:cp, "phoenix/test/unit/controllers/page_controller_test.exs", "test/unit/controllers/page_controller_test.exs"},

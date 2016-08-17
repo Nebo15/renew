@@ -3,7 +3,10 @@ defmodule Renew.Generator do
 
   def add_config(assigns, add) when is_binary(add) do
     {_, assigns} = Map.get_and_update(assigns, :config, fn config ->
-      {config, config <> "\n" <> add}
+      conf = config <> "\n" <> add
+      |> String.trim_trailing
+
+      {config, conf}
     end)
 
     assigns
@@ -11,7 +14,10 @@ defmodule Renew.Generator do
 
   def add_test_config(assigns, add) when is_binary(add) do
     {_, assigns} = Map.get_and_update(assigns, :config_test, fn config_test ->
-      {config_test, config_test <> "\n" <> add}
+      conf = config_test <> "\n" <> add
+      |> String.trim_trailing
+
+      {config_test, conf}
     end)
 
     assigns
@@ -19,7 +25,10 @@ defmodule Renew.Generator do
 
   def add_dev_config(assigns, add) when is_binary(add) do
     {_, assigns} = Map.get_and_update(assigns, :config_dev, fn config_dev ->
-      {config_dev, config_dev <> "\n" <> add}
+      conf = config_dev <> "\n" <> add
+      |> String.trim_trailing
+
+      {config_dev, conf}
     end)
 
     assigns
@@ -27,7 +36,10 @@ defmodule Renew.Generator do
 
   def add_prod_config(assigns, add) when is_binary(add) do
     {_, assigns} = Map.get_and_update(assigns, :config_prod, fn config_prod ->
-      {config_prod, config_prod <> "\n" <> add}
+      conf = config_prod <> "\n" <> add
+      |> String.trim_trailing
+
+      {config_prod, conf}
     end)
 
     assigns

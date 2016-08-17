@@ -1,4 +1,8 @@
 defmodule <%= @module_name %>.Endpoint do
+  @moduledoc """
+  Phoenix Endpoint for <%= @application_name %> application.
+  """
+
   use Phoenix.Endpoint, otp_app: :<%= @application_name %><%= if @ecto do %>
 
   # Allow acceptance tests to run in concurrent mode

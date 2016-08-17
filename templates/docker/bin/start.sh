@@ -3,14 +3,12 @@ PROJECT_NAME=${PROJECT_DIR##*/}
 
 echo "[I] Starting a Docker container '${PROJECT_NAME}' from path '${PROJECT_DIR}'.."
 
-<%= if @sup do %>
-docker start -p 4000 \
+<%= if @sup do %>docker run -p 4000 \
        --env-file .env \
        -d \
        --name ${PROJECT_NAME} \
        ${PROJECT_NAME}
-<% else %>
-docker start -p 4000 \
+<% else %>docker run -p 4000 \
        --env-file .env \
        --rm \
        --name ${PROJECT_NAME} \

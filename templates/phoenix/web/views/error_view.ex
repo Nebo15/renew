@@ -1,4 +1,8 @@
 defmodule <%= @module_name %>.ErrorView do
+  @moduledoc """
+  Place your error views here.
+  """
+
   use <%= @module_name %>.Web, :view
 
   def render("404.json", _assigns) do
