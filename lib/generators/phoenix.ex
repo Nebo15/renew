@@ -4,7 +4,7 @@ defmodule Renew.Generators.Phoenix do
   @tpl [
     {:append, "phoenix/README.md",                     "README.md"},
     {:cp, "phoenix/lib/endpoint.ex",                   "lib/<%= @application_name %>/endpoint.ex"},
-    {:cp, "phoenix/test/support/conn_case.ex",         "test/support/conn_case.ex"},
+    {:cp, "phoenix/test/support/conn_case.exs",         "test/support/conn_case.exs"},
     {:mkdir, "phoenix/test/acceptance/intial_gate",    "test/acceptance/intial_gate"},
     {:cp, "phoenix/web/gates/initial_gate.ex",          "web/gates/initial_gate.ex"},
     {:cp, "phoenix/web/router.ex",                      "web/router.ex"},
@@ -30,6 +30,7 @@ defmodule Renew.Generators.Phoenix do
     ~S({:timex, "~> 3.0"}),
     ~S({:timex_ecto, "~> 3.0"}),
     ~S({:multiverse, "~> 0.4.1"}),
+    ~S({:hound, "~> 1.0", only: [:test]})
   ]
 
   @deps_ecto [
