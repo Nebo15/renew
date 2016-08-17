@@ -69,6 +69,7 @@ defmodule Mix.Tasks.Renew do
   @generator_plugins [
     Renew.Generators.Supervisor,
     Renew.Generators.Ecto,
+    Renew.Generators.Phoenix,
     Renew.Generators.Docker,
     Renew.Generators.CI,
   ]
@@ -83,11 +84,12 @@ defmodule Mix.Tasks.Renew do
     phoenix: :boolean,
     umbrella: :boolean,
     app: :string,
-    module: :string]
+    module: :string,
+  ]
 
   @spec run(OptionParser.argv) :: :ok
   def run(argv) do
-    {opts, argv} = OptionParser.parse!(argv, strict: @switches)
+    {opts, argv} = OptionParser.parse!(argv, strict: @switches, aliases: [db: :ecto_db])
 
     # Normalize opts structure
     opts = [
@@ -134,6 +136,9 @@ defmodule Mix.Tasks.Renew do
             config_test: "",
             config_dev: "",
             config_prod: "",
+            secret_key_base: random_string(64),
+            secret_key_base_prod: random_string(64),
+            signing_salt: random_string(8),
           })
 
         gens = @generator_plugins
@@ -216,6 +221,10 @@ defmodule Mix.Tasks.Renew do
       end
   end
 
+  defp random_string(length) do
+    :crypto.strong_rand_bytes(length) |> Base.encode64 |> binary_part(0, length)
+  end
+
   defp in_umbrella?(app_path) do
     try do
       umbrella = Path.expand(Path.join [app_path, "..", ".."]) # TODO debug
@@ -251,7 +260,8 @@ defmodule Mix.Tasks.Renew do
       - Parent umbrella application bindings<% end %><%= if @sup do %>
       - Application supervisor<% end %><%= if @ecto do %>
       - Ecto database wrapper with <%= @ecto_db %> adapter.<% end %><%= if @phoenix do %>
-      - Phoenix framework<% end %><%= if @amqp do %>
+      - Phoenix Framework
+      - Multiverse response compatibility layers<% end %><%= if @amqp do %>
       - AQMP RabbitMQ wrapper<% end %><%= if @ci do %>
       - Code Coverage, Analysis and Benchmarking tools
       - Setup for Travis-CI Continuous Integration<% end %><%= if @docker do %>

@@ -5,7 +5,7 @@ defmodule Renew.Generators.Ecto do
     {:cp, "ecto/lib/repo.ex",                   "lib/<%= @application_name %>/repo.ex"},
     {:cp, "ecto/priv/repo/seeds.exs",           "priv/repo/seeds.exs"},
     {:mkdir, "ecto/priv/repo/migrations/",      "priv/repo/migrations/"},
-    {:mkdir, "ecto/test/models/",               "test/models/"},
+    {:mkdir, "ecto/test/unit/models/",          "test/unit/models/"},
     {:cp, "ecto/test/support/model_case.exs",   "test/support/model_case.exs"},
     {:append, "ecto/.env",                      ".env"},
   ]
@@ -67,7 +67,7 @@ defmodule Renew.Generators.Ecto do
 
   defp db_config(application_name, module_name, adapter_name, db_user, db_password) do
     main = """
-    # Config for Ecto DB wrapper
+    # Configure your database
     config :#{application_name}, #{module_name}.Repo,
       adapter: #{adapter_name},
       database: "#{application_name}_dev",
@@ -77,14 +77,14 @@ defmodule Renew.Generators.Ecto do
     """
 
     test = """
-    # Config for Ecto DB wrapper
+    # Configure your database
     config :#{application_name}, #{module_name}.Repo,
       pool: Ecto.Adapters.SQL.Sandbox,
       database: "#{application_name}_test"
     """
 
     prod = """
-    # Config for Ecto DB wrapper
+    # Configure your database
     config :#{application_name}, #{module_name}.Repo,
       adapter: #{adapter_name},
       database: "${DB_NAME}",

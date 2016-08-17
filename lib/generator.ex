@@ -49,6 +49,14 @@ defmodule Renew.Generator do
     assigns
   end
 
+  def add_project_compilers(assigns, add) when is_list(add) do
+    {_, assigns} = Map.get_and_update(assigns, :project_compilers, fn project_compilers ->
+      {project_compilers, project_compilers ++ add}
+    end)
+
+    assigns
+  end
+
   def add_project_applications(assigns, add) when is_list(add) do
     {_, assigns} = Map.get_and_update(assigns, :project_applications, fn project_applications ->
       {project_applications, project_applications ++ add}
@@ -65,17 +73,26 @@ defmodule Renew.Generator do
     assigns
   end
 
-  def apply_template(files, path, assigns, opts \\ []) do
-    # Path to templates
+  def get_template(file, assigns) when is_list(assigns) do
     root = Path.expand("../templates", __DIR__)
 
+    file
+    |> (&Path.join(root, &1)).()
+    |> File.read!
+    |> EEx.eval_string(assigns: assigns)
+  end
+
+  def get_template(file, %{} = assigns) do
+    assigns_map = assigns
+    |> assigns_to_eex_map
+
+    get_template(file, assigns_map)
+  end
+
+  def apply_template(files, path, assigns, opts \\ []) do
     # Convert everything to EEx strings
     assigns_map = assigns
-    |> convert_project_dependencies
-    |> convert_project_settings
-    |> convert_project_applications
-    |> convert_project_compilers
-    |> Map.to_list
+    |> assigns_to_eex_map
 
     # Apply all templates
     for {format, source, destination} <- files do
@@ -86,16 +103,12 @@ defmodule Renew.Generator do
       case format do
         :cp ->
           template = source
-          |> (&Path.join(root, &1)).()
-          |> File.read!
-          |> EEx.eval_string(assigns: assigns_map)
+          |> get_template(assigns_map)
 
           create_file(target, template, opts)
         :append ->
           template = source
-          |> (&Path.join(root, &1)).()
-          |> File.read!
-          |> EEx.eval_string(assigns: assigns_map)
+          |> get_template(assigns_map)
 
           File.write!(target, File.read!(target) <> "\n" <> template)
         :mkdir ->
@@ -110,6 +123,15 @@ defmodule Renew.Generator do
           :ok
       end
     end
+  end
+
+  def assigns_to_eex_map(assigns) do
+    assigns
+    |> convert_project_dependencies
+    |> convert_project_settings
+    |> convert_project_applications
+    |> convert_project_compilers
+    |> Map.to_list
   end
 
   defp convert_project_dependencies(assigns) do
@@ -149,13 +171,7 @@ defmodule Renew.Generator do
 
   defp convert_project_compilers(assigns) do
     {_, assigns} = Map.get_and_update(assigns, :project_compilers, fn project_compilers ->
-      t = Enum.join(project_compilers, ",\n     ")
-      case t do
-        "" ->
-          {project_compilers, nil}
-        _ ->
-          {project_compilers, ",\n     " <> t}
-      end
+      {project_compilers, Enum.join(project_compilers, ", ")}
     end)
 
     assigns

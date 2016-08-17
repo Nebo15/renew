@@ -20,7 +20,10 @@ RUN mix deps.get
 
 # Generate release
 ADD . .
-RUN mix release --env=prod
+RUN mix do compile, release --env=default --verbose
+
+# Create folder for logs
+RUN mkdir -p ./log
 
 # Clean sources, but save migrations for Ecto.Migrator
 RUN if [ -d "priv" ]; then mkdir rel/priv; mv priv/* rel/priv; fi

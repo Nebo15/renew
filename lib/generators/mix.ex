@@ -33,20 +33,16 @@ defmodule Renew.Generators.Mix do
     {:cp, "umbrella/mix.exs",            "mix.exs"},
   ]
 
-  @project_settings_umbrella [
+  @project_settings_in_umbrella [
     ~S(build_path: "../../_build"),
     ~S(config_path: "../../config/config.exs"),
     ~S(deps_path: "../../deps"),
     ~S(lockfile: "../../mix.lock"),
   ]
 
-  def apply_settings({path, %{umbrella: true} = assigns}) do
-    {path, assigns}
-  end
-
   def apply_settings({path, %{in_umbrella: true} = assigns}) do
     assigns = assigns
-    |> add_project_settings(@project_settings_umbrella)
+    |> add_project_settings(@project_settings_in_umbrella)
 
     {path, assigns}
   end

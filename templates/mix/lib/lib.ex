@@ -8,8 +8,10 @@ defmodule <%= @module_name %> do
 
     # Define workers and child supervisors to be supervised
     children = [<%= if @ecto do %>
-      # Ecto child supervisor
-      supervisor(<%= @module_name %>.Repo, [])<% end %>
+      # Start the Ecto repository
+      supervisor(<%= @module_name %>.Repo, []),<% end %><%= if @phoenix do %>
+      # Start the endpoint when the application starts
+      supervisor(<%= @module_name %>.Endpoint, []),<% end %>
       # Starts a worker by calling: <%= @module_name %>.Worker.start_link(arg1, arg2, arg3)
       # worker(<%= @module_name %>.Worker, [arg1, arg2, arg3]),
     ]
@@ -18,5 +20,13 @@ defmodule <%= @module_name %> do
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: <%= @module_name %>.Supervisor]
     Supervisor.start_link(children, opts)
+  end<%= if @phoenix do %>
+
+  # Tell Phoenix to update the endpoint configuration
+  # whenever the application is updated.
+  def config_change(changed, _new, removed) do
+    <%= @module_name %>.Endpoint.config_change(changed, removed)
+    :ok
   end<% end %>
+  <% end %>
 end
