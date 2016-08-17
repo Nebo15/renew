@@ -16,7 +16,8 @@ config :<%= @application_name %>, <%= @module_name %>.Endpoint,
     port: "${APP_PORT}"
   ],
   secret_key_base: "${APP_SECRET_KEY}",
-  cache_static_manifest: "priv/static/manifest.json"
+  debug_errors: false,
+  code_reloader: false
 
 # Do not print debug messages in production
 config :logger, level: :info

@@ -1,5 +1,10 @@
 defmodule <%= @module_name %>.Endpoint do
-  use Phoenix.Endpoint, otp_app: :<%= @application_name %>
+  use Phoenix.Endpoint, otp_app: :<%= @application_name %><%= if @ecto do %>
+
+  # Allow acceptance tests to run in concurrent mode
+  if Application.get_env(:concurrent_acceptance, :sql_sandbox) do
+    plug Phoenix.Ecto.SQL.Sandbox
+  end<%= end %>
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.

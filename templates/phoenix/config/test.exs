@@ -2,7 +2,10 @@
 # you can enable the server option below.
 config :<%= @application_name %>, <%= @module_name %>.Endpoint,
   http: [port: 4001],
-  server: false
+  server: true
 
 # Print only warnings and errors during test
 config :logger, level: :warn
+
+# Run acceptance test in concurrent mode
+config :<%= @application_name %>, sql_sandbox: true

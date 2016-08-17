@@ -2,9 +2,10 @@
 # is restricted to this project.
 
 # General application configuration
+<%= if Macro.camelize(@application_name) != @module_name || @ecto do %>
 config :<%= @application_name %><%= if Macro.camelize(@application_name) != @module_name do %>,
   namespace: <%= @module_name %><% end %><%= if @ecto do %>,
-  ecto_repos: [<%= @module_name %>.Repo]
+  ecto_repos: [<%= @module_name %>.Repo]<% end %>
 
 <% end %># Configures the endpoint
 config :<%= @application_name %>, <%= @module_name %>.Endpoint,

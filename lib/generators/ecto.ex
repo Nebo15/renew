@@ -6,7 +6,7 @@ defmodule Renew.Generators.Ecto do
     {:cp, "ecto/priv/repo/seeds.exs",           "priv/repo/seeds.exs"},
     {:mkdir, "ecto/priv/repo/migrations/",      "priv/repo/migrations/"},
     {:mkdir, "ecto/test/unit/models/",          "test/unit/models/"},
-    {:cp, "ecto/test/support/model_case.exs",   "test/support/model_case.exs"},
+    {:cp, "ecto/test/support/model_case.ex",    "test/support/model_case.ex"},
     {:append, "ecto/.env",                      ".env"},
   ]
 

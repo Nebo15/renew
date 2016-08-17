@@ -1,26 +1,26 @@
 # The directory Mix will write compiled artifacts to.
-/_build
+_build
 
 # The directory Mix downloads your dependencies sources to.
-/deps
+deps
 
 # If you run "mix test --cover", coverage assets end up here.
-/cover
+cover
 
 # Ignore released binaries
-/rel/*/
+rel/<%= @application_name %>
 
 # If the VM crashes, it generates a dump, let's ignore it too.
 erl_crash.dump
 
 # Ignore any node modules, as they should be fetched within container
-/node_modules
+node_modules
 
 # Ignore static files
-/priv/static/*
+priv/static/*
 
 # Ignore Phoenix uploads in dev env
-/uploads/files/*
+uploads/files/*
 
 # Ignore git artifacts
 .git

@@ -5,6 +5,7 @@ defmodule Renew.Generators.Docker do
     {:cp, "docker/.dockerignore",        ".dockerignore"},
     {:cp, "docker/Dockerfile",           "Dockerfile"},
     {:cp, "docker/bin/build.sh",         "bin/build.sh"},
+    {:cp, "docker/bin/start.sh",         "bin/start.sh"},
     {:cp, "docker/rel/hooks/pre_run.sh", "rel/hooks/pre_run.sh"},
   ]
 

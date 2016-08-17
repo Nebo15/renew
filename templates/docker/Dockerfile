@@ -27,10 +27,11 @@ RUN mkdir -p ./log
 
 # Clean sources, but save migrations for Ecto.Migrator
 RUN if [ -d "priv" ]; then mkdir rel/priv; mv priv/* rel/priv; fi
-RUN find . -maxdepth 1 -not -name "rel" -not -name "." -exec rm -rf {} \\;
-RUN mv rel/* ./
+RUN find . -maxdepth 1 -not -name "rel" -not -name "." -exec rm -rf {} \;
+
+# Change working directory to release dir
+WORKDIR rel
 RUN rm config.exs
-RUN rm -r rel
 
 # Allow to read ENV vars for mix configs
 ENV REPLACE_OS_VARS=true
@@ -48,5 +49,7 @@ RUN hooks/pre_run.sh
 #  You can run it in one of the following ways:
 #    Interactive: <%= @application_name %>/bin/<%= @application_name %> console
 #    Foreground: <%= @application_name %>/bin/<%= @application_name %> foreground
-#    Daemon: <%= @application_name %>/bin/<%= @application_name %> start
-CMD <%= @application_name %>/bin/<%= @application_name %> <%= if @sup || @phoenix do %>start<% else %>console<% end %>
+#    Daemon: <%= @application_name %>/bin/<%= @application_name %> start<%= if @ecto do %>
+#  Also you can run migrations whenever container starts:
+#    <%= @application_name %>/bin/<%= @application_name %> start --migrate<% end %>
+CMD <%= @application_name %>/bin/<%= @application_name %> <%= if @sup do %>foreground<% else %>console<% end %>

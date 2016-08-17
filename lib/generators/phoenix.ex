@@ -3,17 +3,24 @@ defmodule Renew.Generators.Phoenix do
 
   @tpl [
     {:append, "phoenix/README.md",                     "README.md"},
+    {:append, "phoenix/.env",                          ".env"},
     {:cp, "phoenix/lib/endpoint.ex",                   "lib/<%= @application_name %>/endpoint.ex"},
-    {:cp, "phoenix/test/support/conn_case.exs",         "test/support/conn_case.exs"},
-    {:mkdir, "phoenix/test/acceptance/intial_gate",    "test/acceptance/intial_gate"},
-    {:cp, "phoenix/web/gates/initial_gate.ex",          "web/gates/initial_gate.ex"},
-    {:cp, "phoenix/web/router.ex",                      "web/router.ex"},
-    {:cp, "phoenix/web/web.ex",                         "web/web.ex"},
-    {:cp, "phoenix/web/views/error_view.ex",            "web/views/error_view.ex"},
-    {:cp, "phoenix/web/views/page_view.ex",             "web/views/page_view.ex"},
-    {:cp, "phoenix/web/views/layout_view.ex",           "web/views/layout_view.ex"},
-    {:cp, "phoenix/web/controllers/page_controller.ex", "web/controllers/page_controller.ex"},
+
+    {:cp, "phoenix/test/support/conn_case.ex",         "test/support/conn_case.ex"},
+    {:cp, "phoenix/test/support/acceptance_case.ex",   "test/support/acceptance_case.ex"},
+    {:cp, "phoenix/web/gates/initial_gate.ex",         "web/gates/initial_gate.ex"},
+    {:cp, "phoenix/web/router.ex",                     "web/router.ex"},
+    {:cp, "phoenix/web/web.ex",                        "web/web.ex"},
+    {:cp, "phoenix/web/views/error_view.ex",           "web/views/error_view.ex"},
+    {:cp, "phoenix/web/views/page_view.ex",            "web/views/page_view.ex"},
+    {:cp, "phoenix/web/views/layout_view.ex",          "web/views/layout_view.ex"},
+    {:cp, "phoenix/web/controllers/page_controller.ex",             "web/controllers/page_controller.ex"},
+    {:cp, "phoenix/test/acceptance/initial_gate/page_test.exs",     "test/acceptance/intial_gate/page_test.exs"},
     {:cp, "phoenix/test/unit/controllers/page_controller_test.exs", "test/unit/controllers/page_controller_test.exs"},
+  ]
+
+  @tpl_ecto [
+    {:cp, "phoenix/lib/migrator.ex", "lib/<%= @application_name %>/migrator.ex"},
   ]
 
   @compilers [
@@ -28,12 +35,11 @@ defmodule Renew.Generators.Phoenix do
     ~S({:phoenix_pubsub, "~> 1.0"}),
     ~S({:ex_json_schema, "~> 0.5"}),
     ~S({:timex, "~> 3.0"}),
-    ~S({:timex_ecto, "~> 3.0"}),
     ~S({:multiverse, "~> 0.4.1"}),
-    ~S({:hound, "~> 1.0", only: [:test]})
   ]
 
   @deps_ecto [
+    ~S({:timex_ecto, "~> 3.0"}),
     ~S({:phoenix_ecto, "~> 3.0"}),
   ]
 
@@ -44,11 +50,11 @@ defmodule Renew.Generators.Phoenix do
     ~S(:phoenix),
     ~S(:phoenix_pubsub),
     ~S(:timex),
-    ~S(:timex_ecto),
     ~S(:multiverse),
   ]
 
   @apps_ecto [
+    ~S(:timex_ecto),
     ~S(:phoenix_ecto),
   ]
 
@@ -80,6 +86,12 @@ defmodule Renew.Generators.Phoenix do
 
   defp apply_ecto_settings(assigns) do
     assigns
+  end
+
+  def apply_template({path, %{ecto: true} = assigns}) do
+    apply_template @tpl ++ @tpl_ecto, path, assigns
+
+    {path, assigns}
   end
 
   def apply_template({path, assigns}) do
