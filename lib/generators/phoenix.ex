@@ -1,7 +1,7 @@
 defmodule Renew.Generators.Phoenix do
-  import Renew.Generator
+  use Renew.Generator
 
-  @tpl [
+  load_templates :tpl, [
     {:append, "phoenix/README.md",                     "README.md"},
     {:append, "phoenix/.env",                          ".env"},
     {:cp, "phoenix/lib/endpoint.ex",                   "lib/<%= @application_name %>/endpoint.ex"},
@@ -18,9 +18,14 @@ defmodule Renew.Generators.Phoenix do
     {:cp, "phoenix/test/unit/controllers/page_controller_test.exs", "test/unit/controllers/page_controller_test.exs"},
   ]
 
-  @tpl_ecto [
+  load_templates :tpl_ecto, [
     {:cp, "phoenix/lib/migrator.ex", "lib/<%= @application_name %>/migrator.ex"},
   ]
+
+  load_template :config_main, 'phoenix/config/config.exs'
+  load_template :config_test, 'phoenix/config/test.exs'
+  load_template :config_dev,  'phoenix/config/dev.exs'
+  load_template :config_prod, 'phoenix/config/prod.exs'
 
   @compilers [
     ~S(:phoenix),
@@ -101,17 +106,17 @@ defmodule Renew.Generators.Phoenix do
   end
 
   defp get_config(assigns) do
-    main = 'phoenix/config/config.exs'
-    |> get_template(assigns)
+    main = @config_main
+    |> eval_template(assigns)
 
-    test = 'phoenix/config/test.exs'
-    |> get_template(assigns)
+    test = @config_test
+    |> eval_template(assigns)
 
-    dev = 'phoenix/config/dev.exs'
-    |> get_template(assigns)
+    dev = @config_dev
+    |> eval_template(assigns)
 
-    prod = 'phoenix/config/prod.exs'
-    |> get_template(assigns)
+    prod = @config_prod
+    |> eval_template(assigns)
 
     {main, test, dev, prod}
   end

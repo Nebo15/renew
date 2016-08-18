@@ -1,14 +1,14 @@
 defmodule Renew.Generators.Mix do
-  import Renew.Generator
+  use Renew.Generator
 
-  @tpl [
+  load_templates :tpl, [
     {:cp, "mix/README.md",               "README.md"},
     {:cp, "mix/LICENSE.md",              "LICENSE.md"},
     {:cp, "mix/.gitignore",              ".gitignore"},
     {:cp, "mix/.env",                    ".env"},
   ]
 
-  @tpl_mix [
+  load_templates :tpl_mix, [
     {:cp, "mix/config/config.exs",       "config/config.exs"},
     {:cp, "mix/config/dev.exs",          "config/dev.exs"},
     {:cp, "mix/config/test.exs",         "config/test.exs"},
@@ -19,7 +19,7 @@ defmodule Renew.Generators.Mix do
     {:cp, "mix/test/unit/lib_test.exs",  "test/unit/<%= @application_name %>_test.exs"},
   ]
 
-  @tpl_release [
+  load_templates :tpl_release, [
     {:cp, "mix/rel/config.exs",          "rel/config.exs"},
   ]
 
@@ -27,7 +27,7 @@ defmodule Renew.Generators.Mix do
     ~S({:distillery, "~> 0.9"}),
   ]
 
-  @tpl_umbrella @tpl ++ [
+  load_templates :tpl_umbrella, [
     {:mkdir, "apps/",                    "apps/"},
     {:cp, "umbrella/config/config.exs",  "config/config.exs"},
     {:cp, "umbrella/mix.exs",            "mix.exs"},
@@ -55,7 +55,7 @@ defmodule Renew.Generators.Mix do
   end
 
   def apply_template({path, %{umbrella: true} = assigns}) do
-    apply_template @tpl_umbrella, path, assigns
+    apply_template @tpl ++ @tpl_umbrella, path, assigns
 
     {path, assigns}
   end

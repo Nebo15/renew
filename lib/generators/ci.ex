@@ -1,7 +1,7 @@
 defmodule Renew.Generators.CI do
-  import Renew.Generator
+  use Renew.Generator
 
-  @tpl [
+  load_templates :tpl, [
     {:cp, "ci/bin/hooks/pre-commit.sh",  "bin/hooks/pre-commit.sh"},
     {:cp, "ci/bin/install-git-hooks.sh", "bin/install-git-hooks.sh"},
     {:cp, "ci/config/.credo.exs",        "config/.credo.exs"},

@@ -1,7 +1,7 @@
 defmodule Renew.Generators.Ecto do
-  import Renew.Generator
+  use Renew.Generator
 
-  @tpl [
+  load_templates :tpl, [
     {:cp, "ecto/lib/repo.ex",                   "lib/<%= @application_name %>/repo.ex"},
     {:cp, "ecto/priv/repo/seeds.exs",           "priv/repo/seeds.exs"},
     {:mkdir, "ecto/priv/repo/migrations/",      "priv/repo/migrations/"},

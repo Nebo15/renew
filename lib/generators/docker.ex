@@ -1,7 +1,7 @@
 defmodule Renew.Generators.Docker do
-  import Renew.Generator
+  use Renew.Generator
 
-  @tpl [
+  load_templates :tpl, [
     {:cp, "docker/.dockerignore",        ".dockerignore"},
     {:cp, "docker/Dockerfile",           "Dockerfile"},
     {:cp, "docker/bin/build.sh",         "bin/build.sh"},

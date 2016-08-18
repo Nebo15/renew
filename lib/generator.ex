@@ -1,6 +1,45 @@
 defmodule Renew.Generator do
   import Mix.Generator
 
+  defmacro __using__(_opts) do
+    quote do
+      import Renew.Generator
+    end
+  end
+
+  def get_template_source(source) do
+    root = Path.expand("../templates", __DIR__)
+
+    source
+    |> (&Path.join(root, &1)).()
+    |> File.read!
+  end
+
+  defmacro load_templates(name, templates) do
+    quote bind_quoted: binding do
+
+      tmp = templates
+      |> Enum.map(fn ({action, source, destination}) ->
+        case action do
+          :cp ->
+            {action, get_template_source(source), destination}
+          :append ->
+            {action, get_template_source(source), destination}
+          _ ->
+            {action, source, destination}
+        end
+      end)
+
+      Module.put_attribute __MODULE__, name, tmp
+    end
+  end
+
+  defmacro load_template(name, file) do
+    quote bind_quoted: binding do
+      Module.put_attribute __MODULE__, name, get_template_source(file)
+    end
+  end
+
   def add_config(assigns, add) when is_binary(add) do
     {_, assigns} = Map.get_and_update(assigns, :config, fn config ->
       conf = config <> "\n" <> add
@@ -85,20 +124,16 @@ defmodule Renew.Generator do
     assigns
   end
 
-  def get_template(file, assigns) when is_list(assigns) do
-    root = Path.expand("../templates", __DIR__)
-
-    file
-    |> (&Path.join(root, &1)).()
-    |> File.read!
+  def eval_template(template, assigns) when is_list(assigns) do
+    template
     |> EEx.eval_string(assigns: assigns)
   end
 
-  def get_template(file, %{} = assigns) do
+  def eval_template(template, %{} = assigns) do
     assigns_map = assigns
     |> assigns_to_eex_map
 
-    get_template(file, assigns_map)
+    eval_template(template, assigns_map)
   end
 
   def apply_template(files, path, assigns, opts \\ []) do
@@ -107,20 +142,20 @@ defmodule Renew.Generator do
     |> assigns_to_eex_map
 
     # Apply all templates
-    for {format, source, destination} <- files do
+    for {action, source, destination} <- files do
       target = destination
       |> EEx.eval_string(assigns: assigns_map)
       |> (&Path.join(path, &1)).()
 
-      case format do
+      case action do
         :cp ->
           template = source
-          |> get_template(assigns_map)
+          |> eval_template(assigns_map)
 
           create_file(target, template, opts)
         :append ->
           template = source
-          |> get_template(assigns_map)
+          |> eval_template(assigns_map)
 
           File.write!(target, File.read!(target) <> "\n" <> template)
         :mkdir ->
