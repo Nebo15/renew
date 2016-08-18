@@ -19,7 +19,7 @@ defmodule Renew.Generators.Phoenix do
   ]
 
   load_templates :tpl_ecto, [
-    {:cp, "phoenix/lib/migrator.ex", "lib/<%= @application_name %>/migrator.ex"},
+    {:cp, "phoenix/lib/tasks.ex", "lib/<%= @application_name %>/tasks.ex"},
   ]
 
   load_template :config_main, 'phoenix/config/config.exs'
@@ -36,7 +36,6 @@ defmodule Renew.Generators.Phoenix do
     ~S({:httpoison, "~> 0.9.0"}),
     ~S({:poison, "~> 2.0"}),
     ~S({:phoenix, "~> 1.2.0"}),
-    ~S({:phoenix_pubsub, "~> 1.0"}),
     ~S({:ex_json_schema, "~> 0.5"}),
     ~S({:timex, "~> 3.0"}),
     ~S({:multiverse, "~> 0.4.1"}),
@@ -47,12 +46,16 @@ defmodule Renew.Generators.Phoenix do
     ~S({:phoenix_ecto, "~> 3.0"}),
   ]
 
+  @deps_aqmp [
+    ~S({:phoenix_pubsub, "~> 1.0"}),
+    ~S({:phoenix_pubsub_rabbitmq, "~> 0.0.1"}),
+  ]
+
   @apps [
     ~S(:cowboy),
     ~S(:httpoison),
     ~S(:poison),
     ~S(:phoenix),
-    ~S(:phoenix_pubsub),
     ~S(:timex),
     ~S(:multiverse),
     ~S(:ex_json_schema),
@@ -61,6 +64,11 @@ defmodule Renew.Generators.Phoenix do
   @apps_ecto [
     ~S(:timex_ecto),
     ~S(:phoenix_ecto),
+  ]
+
+  @apps_aqmp [
+    ~S(:phoenix_pubsub),
+    ~S(:phoenix_pubsub_rabbitmq),
   ]
 
   def apply?(assigns) do

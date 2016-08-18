@@ -11,9 +11,7 @@ config :<%= @application_name %><%= if Macro.camelize(@application_name) != @mod
 config :<%= @application_name %>, <%= @module_name %>.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "<%= @secret_key_base %>",
-  render_errors: [view: <%= @module_name %>.ErrorView, accepts: ~w(json)],
-  pubsub: [name: <%= @module_name %>.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+  render_errors: [view: <%= @module_name %>.ErrorView, accepts: ~w(json)]
 
 # Configures Elixir's Logger
 config :logger, :console,

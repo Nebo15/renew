@@ -1,11 +1,11 @@
-defmodule <%= @module_name %>.Repo.Migrator do
+defmodule :<%= @application_name %>_tasks do
   @moduledoc """
   Nice way to apply migrations inside a released application.
 
-  Just start app with `--migrate` command, be careful when doing this in production.
-  """
+  Example:
 
-  require Logger
+      <%= @application_name %>/bin/<%= @application_name %> command <%= @application_name %>_tasks migrate!
+  """
 
   @priv_dir :code.priv_dir(:<%= @application_name %>)
 
@@ -13,8 +13,8 @@ defmodule <%= @module_name %>.Repo.Migrator do
     migrations_dir = Path.join([@priv_dir, "repo", "migrations"])
 
     # Run migrations
-    Logger.warn "Running migrations via release options."
-    Logger.warn Ecto.Migrator.run(MyApp.Repo, migrations_dir, :up, all: true)
+    IO.inspect "Running migrations via release options."
+    Ecto.Migrator.run(<%= @module_name %>.Repo, migrations_dir, :up, all: true)
 
     :ok
   end
@@ -23,7 +23,7 @@ defmodule <%= @module_name %>.Repo.Migrator do
     seed_script = Path.join([@priv_dir, "repo", "seeds.exs"])
 
     # Run seed script
-    Logger.warn "Running seeder via release options."
+    IO.inspect "Running seeder via release options."
     Code.require_file(seed_script)
 
     :ok
