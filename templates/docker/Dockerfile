@@ -1,49 +1,70 @@
-# Set the Docker image you want to base your image off.
-# I chose this one because it has Elixir preinstalled.
-FROM trenpixster/elixir:<%= @elixir_minor_version %>
+FROM bitwalker/alpine-erlang:latest
 
 # Maintainers
 MAINTAINER Nebo#15 @nebo15
 
-# Install other stable dependencies that don't change often
+# Configure environment variables and other settings
+ENV TERM=xterm \
+    ELIXIR_VERSION=<%= @elixir_minor_version %>-r0 \
+    MIX_ENV=prod \
+    APP_NAME=<%= @application_name %> \
+    APP_PORT=4000
 
-# Compile app
-RUN mkdir /app
-WORKDIR /app
+WORKDIR ${HOME}
 
-# Install Elixir Deps
-ADD mix.* ./
-ENV MIX_ENV=prod
-RUN mix local.rebar --force
-RUN mix local.hex --force
-RUN mix deps.get
+# Install Elixir
+RUN \
+    echo "@edge http://nl.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories && \
+    apk --no-cache --update add elixir@edge=$ELIXIR_VERSION git && \
+    mix local.hex --force && \
+    mix local.rebar --force
 
-# Generate release
-ADD . .
-RUN mix do compile, release --env=default --verbose
+# Reduce container size
+RUN rm -rf /var/cache/apk/*
 
-# Create folder for logs
-RUN mkdir -p ./log
+# Install and compile project dependencies
+COPY mix.* ./
+RUN mix do deps.get, deps.compile
 
-# Clean sources, but save migrations for Ecto.Migrator
-RUN if [ -d "priv" ]; then mkdir rel/priv; mv priv/* rel/priv; fi
-RUN find . -maxdepth 1 -not -name "rel" -not -name "." -exec rm -rf {} \;
+# Add project sources
+COPY . .
 
-# Change working directory to release dir
-WORKDIR rel
-RUN rm config.exs
+# Compile project for Erlang VM
+RUN mix do compile, release --verbose
+
+# Move release to /opt/$APP_NAME
+RUN \
+    mkdir -p $HOME/rel/priv && \
+    mkdir -p /opt/$APP_NAME/log && \
+    mkdir -p /opt/$APP_NAME/priv && \
+    mkdir -p /opt/$APP_NAME/hooks && \
+    cp -R $HOME/rel/priv /opt/$APP_NAME/ && \
+    cp -R $HOME/rel/hooks /opt/$APP_NAME/ && \
+    APP_TARBALL=$(find $HOME/rel/$APP_NAME/releases -maxdepth 2 -name ${APP_NAME}.tar.gz) && \
+    cp $APP_TARBALL /opt/$APP_NAME/ && \
+    cd /opt/$APP_NAME && \
+    tar -xzf $APP_NAME.tar.gz && \
+    rm $APP_NAME.tar.gz && \
+    rm -rf /opt/app/* && \
+    chmod -R 777 $HOME && \
+    chmod -R 777 /opt/$APP_NAME
+
+
+# Change user to "default"
+USER default
 
 # Allow to read ENV vars for mix configs
 ENV REPLACE_OS_VARS=true
 
+# Exposes this port from the docker container to the host machine
+<%= if !@phoenix do %># <% end %>EXPOSE ${APP_PORT}
+
+# Change workdir to a released directory
+WORKDIR /opt
+
 # Pre-run hook that allows you to add initialization scripts.
 # They should be located in rel/hooks directory, rest of project will be removed on build.
-RUN hooks/pre_run.sh
-
-# Runtime config
-
-# Exposes this port from the docker container to the host machine
-<%= if !@phoenix do %># <% end %>EXPOSE 4000
+RUN $APP_NAME/hooks/pre_run.sh
 
 # The command to run when this image starts up
 #  You can run it in one of the following ways:
@@ -52,4 +73,4 @@ RUN hooks/pre_run.sh
 #    Daemon: <%= @application_name %>/bin/<%= @application_name %> start<%= if @ecto do %>
 #  Also you can run migrations whenever container starts:
 #    <%= @application_name %>/bin/<%= @application_name %> start --migrate<% end %>
-CMD <%= @application_name %>/bin/<%= @application_name %> <%= if @sup do %>foreground<% else %>console<% end %>
+CMD $APP_NAME/bin/$APP_NAME <%= if @sup do %>foreground<% else %>console<% end %>

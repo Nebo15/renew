@@ -86,3 +86,7 @@ See [Mix.Tasks.New](http://elixir-lang.org/docs/stable/mix/Mix.Tasks.New.html) f
 - http://blog.plataformatec.com.br/2016/05/how-to-config-environment-variables-with-elixir-and-exrm/
 - https://github.com/bitwalker/distillery/blob/master/docs/Runtime%20Configuration.md
 - [Deploying Elixir and Phoenix applications using Docker and Exrm](https://gist.github.com/brienw/85db445a0c3976d323b859b1cdccef9a)
+
+## Thanks
+
+- [bitwalker](https://github.com/bitwalker) for his Docker container script and for being proactive while helping in Distillery issues.

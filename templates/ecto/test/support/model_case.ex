@@ -44,7 +44,8 @@ defmodule <%= @module_name %>.ModelCase do
       assert {:password, "is unsafe"} in errors_on(%User{}, %{password: "password"})
   """
   def errors_on(struct, data) do
-    struct.__struct__.changeset(struct, data)
+    data
+    |> (&struct.__struct__.changeset(struct, &1)).()
     |> Enum.flat_map(fn {key, errors} -> for msg <- errors, do: {key, msg} end)
   end
 end

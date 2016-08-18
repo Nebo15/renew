@@ -7,7 +7,7 @@ defmodule <%= @module_name %>.Repo.Migrator do
 
   require Logger
 
-  @priv_dir "#{:code.priv_dir(:<%= @application_name %>)}"
+  @priv_dir :code.priv_dir(:<%= @application_name %>)
 
   def migrate! do
     migrations_dir = Path.join([@priv_dir, "repo", "migrations"])

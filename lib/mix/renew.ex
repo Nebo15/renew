@@ -264,7 +264,8 @@ defmodule Mix.Tasks.Renew do
       - Multiverse response compatibility layers<% end %><%= if @amqp do %>
       - AQMP RabbitMQ wrapper<% end %><%= if @ci do %>
       - Code Coverage, Analysis and Benchmarking tools
-      - Setup for Travis-CI Continuous Integration<% end %><%= if @docker do %>
+      - Setup for Travis-CI Continuous Integration
+      - Pre-Commit hooks to keep code clean, run `$ ./bin/install-git-hooks.sh`.<% end %><%= if @docker do %>
       - Docker container build config and scripts<% end %>
     """
     |> EEx.eval_string(assigns: Enum.to_list(opts))

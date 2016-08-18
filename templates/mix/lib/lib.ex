@@ -8,9 +8,10 @@ defmodule <%= @module_name %> do
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
   # for more information on OTP Applications
   def start(_type, _args) do
-    import Supervisor.Spec, warn: false
-    <%= if @ecto do %>
+    import Supervisor.Spec, warn: false<%= if @ecto do %>
+
     :ok = handle_args!<% end %>
+
     # Define workers and child supervisors to be supervised
     children = [<%= if @ecto do %>
       # Start the Ecto repository
@@ -30,8 +31,7 @@ defmodule <%= @module_name %> do
   # Tell Phoenix to update the endpoint configuration
   # whenever the application is updated.
   def config_change(changed, _new, removed) do<%= if @ecto do %>
-    :ok = handle_args!
-    <% end %>
+    :ok = handle_args!<% end %>
     <%= @module_name %>.Endpoint.config_change(changed, removed)
     :ok
   end<% end %><% end %><%= if @ecto do %>
@@ -53,7 +53,7 @@ defmodule <%= @module_name %> do
         cond do
           migrate? -> <%= @module_name %>.Repo.Migrator.migrate!
           seed?    -> <%= @module_name %>.Repo.Migrator.seed!
-          :else    -> :ok
+          true     -> :ok
         end
       _ ->
         :ok

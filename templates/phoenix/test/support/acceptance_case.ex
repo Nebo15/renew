@@ -41,8 +41,7 @@ defmodule <%= @module_name %>.AcceptanceCase do
   setup tags do<%= if @ecto do %>
     unless tags[:async] do
       :ok = Ecto.Adapters.SQL.Sandbox.checkout(<%= @module_name %>.Repo)
-    end
-    <% else %>
+    end<% else %>
     _ = tags<% end %>
     :ok
   end

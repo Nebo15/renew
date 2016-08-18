@@ -38,4 +38,5 @@ GitHub.sublime-settings
 # Ignore released binaries
 rel/*/
 !rel/hooks/
+!rel/config.exs
 .deliver

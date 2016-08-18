@@ -50,6 +50,7 @@ defmodule Renew.Generators.Phoenix do
     ~S(:phoenix_pubsub),
     ~S(:timex),
     ~S(:multiverse),
+    ~S(:ex_json_schema),
   ]
 
   @apps_ecto [

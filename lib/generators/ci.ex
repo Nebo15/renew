@@ -2,6 +2,8 @@ defmodule Renew.Generators.CI do
   import Renew.Generator
 
   @tpl [
+    {:cp, "ci/bin/hooks/pre-commit.sh",  "bin/hooks/pre-commit.sh"},
+    {:cp, "ci/bin/install-git-hooks.sh", "bin/install-git-hooks.sh"},
     {:cp, "ci/config/.credo.exs",        "config/.credo.exs"},
     {:cp, "ci/config/dogma.exs",         "config/dogma.exs"},
     {:cp, "ci/coveralls.json",           "coveralls.json"},
