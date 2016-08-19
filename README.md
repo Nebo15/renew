@@ -67,7 +67,7 @@ Your migrations will be preserved within container in `./priv/repo` folder.
 Install this package globally:
 
   ```
-  mix archive.install https://github.com/Nebo15/renew/releases/download/0.8.0/renew.ez
+  mix archive.install https://github.com/Nebo15/renew/releases/download/0.9.0/renew.ez
   ```
 
 ## Usage
