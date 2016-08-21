@@ -34,7 +34,7 @@ defmodule <%= @module_name %>.Web do
 <% end %>
   def controller do
     quote do
-      use Phoenix.Controller<%= if Macro.camelize(@application_name) != @module_name do %>, namespace: <%= @module_name %><% end %>
+      use Phoenix.Controller<%= if @has_custom_module_name? do %>, namespace: <%= @module_name %><% end %>
 <%= if @ecto do %>
       alias <%= @module_name %>.Repo
       import Ecto

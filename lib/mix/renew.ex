@@ -108,7 +108,8 @@ defmodule Mix.Tasks.Renew do
         Mix.raise ~S(Expected PATH to be given, please use "mix renew PATH")
       [path | _] ->
         # Get module and app names
-        app = opts[:app] || Path.basename(Path.expand(path))
+        dirname = opts[:app] || Path.basename(Path.expand(path))
+        app = String.replace(dirname, ["-", "."], "_")
         check_application_name!(app, !!opts[:app])
         mod = opts[:module] || Macro.camelize(app)
         check_module_name_validity!(mod)
@@ -123,6 +124,7 @@ defmodule Mix.Tasks.Renew do
         |> Enum.into(%{})
         |> Map.merge(%{
             module_name: mod,
+            directory_name: dirname,
             application_name: app,
             in_umbrella: in_umbrella?(path),
             elixir_version: get_version(System.version),
@@ -139,6 +141,7 @@ defmodule Mix.Tasks.Renew do
             secret_key_base: random_string(64),
             secret_key_base_prod: random_string(64),
             signing_salt: random_string(8),
+            has_custom_module_name?: Macro.camelize(@application_name) != @module_name
           })
 
         gens = @generator_plugins
@@ -157,7 +160,7 @@ defmodule Mix.Tasks.Renew do
 
         # Print success message
         !!opts[:umbrella]
-        |> get_success_message(app)
+        |> get_success_message(dirname)
         |> String.trim_trailing
         |> Mix.shell.info
     end
@@ -271,14 +274,14 @@ defmodule Mix.Tasks.Renew do
     |> EEx.eval_string(assigns: Enum.to_list(opts))
   end
 
-  defp get_success_message(true, application_name) do
+  defp get_success_message(true, application_dir) do
     """
 
     Your umbrella project was created successfully.
     Inside your project, you will find an apps/ directory
     where you can create and host many apps:
 
-        cd #{application_name}
+        cd #{application_dir}
         cd apps
         mix renew my_app
 
@@ -288,13 +291,13 @@ defmodule Mix.Tasks.Renew do
     """
   end
 
-  defp get_success_message(false, application_name) do
+  defp get_success_message(false, application_dir) do
     """
 
     Your Mix project was created successfully.
     You can use "mix" to compile it, test it, and more:
 
-        cd #{application_name}
+        cd #{application_dir}
         mix test
 
     Run "mix help" for more commands.
