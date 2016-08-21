@@ -141,7 +141,7 @@ defmodule Mix.Tasks.Renew do
             secret_key_base: random_string(64),
             secret_key_base_prod: random_string(64),
             signing_salt: random_string(8),
-            has_custom_module_name?: Macro.camelize(@application_name) != @module_name
+            has_custom_module_name?: Macro.camelize(app) != mod
           })
 
         gens = @generator_plugins
