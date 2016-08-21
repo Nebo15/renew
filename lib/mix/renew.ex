@@ -92,7 +92,7 @@ defmodule Mix.Tasks.Renew do
     {opts, argv} = OptionParser.parse!(argv, strict: @switches, aliases: [db: :ecto_db])
 
     # Normalize opts structure
-    opts = [
+    opts = opts ++ [
       docker: opts[:docker] || false,
       ci: opts[:ci] || false,
       sup: opts[:phoenix] || opts[:sup] || false, # Phoenix requires supervisor
