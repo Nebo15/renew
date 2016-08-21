@@ -2,11 +2,13 @@ defmodule Renew.Generators.Docker do
   use Renew.Generator
 
   load_templates :tpl, [
-    {:cp, "docker/.dockerignore",        ".dockerignore"},
-    {:cp, "docker/Dockerfile",           "Dockerfile"},
-    {:cp, "docker/bin/build.sh",         "bin/build.sh"},
-    {:cp, "docker/bin/start.sh",         "bin/start.sh"},
-    {:cp, "docker/rel/hooks/pre_run.sh", "rel/hooks/pre_run.sh"},
+    {:cp, "docker/.dockerignore",            ".dockerignore"},
+    {:cp, "docker/Dockerfile",               "Dockerfile"},
+    {:cp, "docker/bin/build.sh",             "bin/build.sh"},
+    {:cp, "docker/bin/start.sh",             "bin/start.sh"},
+    {:cp, "docker/bin/version_increment.sh", "bin/version_increment.sh"},
+    {:cp, "docker/bin/release.sh",           "bin/release.sh"},
+    {:cp, "docker/bin/hooks/pre_run.sh",     "bin/hooks/pre_run.sh"},
   ]
 
   def apply?(assigns) do

@@ -39,7 +39,7 @@ RUN \
     mkdir -p /opt/$APP_NAME/priv && \
     mkdir -p /opt/$APP_NAME/hooks && \
     cp -R $HOME/rel/priv /opt/$APP_NAME/ && \
-    cp -R $HOME/rel/hooks /opt/$APP_NAME/ && \
+    cp -R $HOME/bin/hooks /opt/$APP_NAME/ && \
     APP_TARBALL=$(find $HOME/rel/$APP_NAME/releases -maxdepth 2 -name ${APP_NAME}.tar.gz) && \
     cp $APP_TARBALL /opt/$APP_NAME/ && \
     cd /opt/$APP_NAME && \
@@ -63,7 +63,7 @@ ENV REPLACE_OS_VARS=true
 WORKDIR /opt
 
 # Pre-run hook that allows you to add initialization scripts.
-# They should be located in rel/hooks directory, rest of project will be removed on build.
+# All Docker hooks should be located in bin/hooks directory.
 RUN $APP_NAME/hooks/pre_run.sh
 
 # The command to run when this image starts up
