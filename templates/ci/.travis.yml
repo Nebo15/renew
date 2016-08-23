@@ -15,15 +15,17 @@ script:
   - "mix test --trace"
   - "mix coveralls.travis"
   - "mix credo"
-  - "mix dogma"<% if @docker %>
+  - "mix dogma"<%= if @docker do %>
   - "./bin/build.sh"<% end %>
-after_success:<% if @docker %>
+# after_success:<%= if @docker do %>
+
 # Also you can automatically build images and push them to Docker Hub.
-# To do so you need to encrypt your docker user name and password:
+# To do so you need to encrypt your docker user name and password and add to environment variables:
 #
 #   $ travis encrypt DOCKER_USERNAME=sample_username DOCKER_PASSWORD=strong_password
 #
-# Then add it to env.global via secure: https://docs.travis-ci.com/user/encryption-keys/.
+# More info: https://docs.travis-ci.com/user/encryption-keys/
+#
 # Additionally should add env "DOCKER_HUB_ACCOUNT=org_name" to set Hub's organization or account that will hold images.
 # Sample:
 #
@@ -31,6 +33,8 @@ after_success:<% if @docker %>
 #     global:
 #       - DOCKER_HUB_ACCOUNT=org_name # Docker Hub Account or Organization that will hold images
 #       - secure: "encrypeted_credentials" # Encrypted credentials to login into Docker Hub
+#
+# Then uncomment following lines:
 #
 #   - echo "Logging in into Docker Hub";
 #     docker login -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD;
