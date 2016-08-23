@@ -1,1 +1,6 @@
-{}
+{
+  "skip_files": [
+    "test/*",
+    "/lib/<%= @application_name %>/tasks.ex"
+  ]
+}

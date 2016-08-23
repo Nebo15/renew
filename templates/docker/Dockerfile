@@ -64,7 +64,7 @@ WORKDIR /opt
 
 # Pre-run hook that allows you to add initialization scripts.
 # All Docker hooks should be located in bin/hooks directory.
-RUN $APP_NAME/hooks/pre_run.sh
+RUN $APP_NAME/hooks/pre-run.sh
 
 # The command to run when this image starts up
 #  You can run it in one of the following ways:

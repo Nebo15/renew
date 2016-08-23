@@ -6,9 +6,9 @@ defmodule Renew.Generators.Docker do
     {:cp, "docker/Dockerfile",               "Dockerfile"},
     {:cp, "docker/bin/build.sh",             "bin/build.sh"},
     {:cp, "docker/bin/start.sh",             "bin/start.sh"},
-    {:cp, "docker/bin/version_increment.sh", "bin/version_increment.sh"},
+    {:cp, "docker/bin/version-increment.sh", "bin/version-increment.sh"},
     {:cp, "docker/bin/release.sh",           "bin/release.sh"},
-    {:cp, "docker/bin/hooks/pre_run.sh",     "bin/hooks/pre_run.sh"},
+    {:cp, "docker/bin/hooks/pre-run.sh",     "bin/hooks/pre-run.sh"},
   ]
 
   def apply?(assigns) do
