@@ -39,3 +39,7 @@ GitHub.sublime-settings
 rel/*/
 !rel/config.exs
 .deliver
+
+# Don't commit file uploads
+uploads/
+!uploads/.gitkeep

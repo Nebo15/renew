@@ -76,7 +76,7 @@ else
     exit 1
   else
     echo "[I] Creating git tag '${PROJECT_VERSION}'.."
-    echo "Generated release Notes:"
+    echo "    Release Notes: "
     echo $GIT_HISTORY
 
     git tag -a $PROJECT_VERSION -m "${GIT_HISTORY}"

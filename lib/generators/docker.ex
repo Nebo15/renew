@@ -9,6 +9,7 @@ defmodule Renew.Generators.Docker do
     {:cp, "docker/bin/version-increment.sh", "bin/version-increment.sh"},
     {:cp, "docker/bin/release.sh",           "bin/release.sh"},
     {:cp, "docker/bin/hooks/pre-run.sh",     "bin/hooks/pre-run.sh"},
+    {:cp, "docker/bin/ci/push.sh",           "bin/ci/push.sh"},
   ]
 
   def apply?(assigns) do

@@ -46,11 +46,6 @@ defmodule Renew.Generators.Phoenix do
     ~S({:phoenix_ecto, "~> 3.0"}),
   ]
 
-  @deps_aqmp [
-    ~S({:phoenix_pubsub, "~> 1.0"}),
-    ~S({:phoenix_pubsub_rabbitmq, "~> 0.0.1"}),
-  ]
-
   @apps [
     ~S(:cowboy),
     ~S(:httpoison),
@@ -64,11 +59,6 @@ defmodule Renew.Generators.Phoenix do
   @apps_ecto [
     ~S(:timex_ecto),
     ~S(:phoenix_ecto),
-  ]
-
-  @apps_aqmp [
-    ~S(:phoenix_pubsub),
-    ~S(:phoenix_pubsub_rabbitmq),
   ]
 
   def apply?(assigns) do

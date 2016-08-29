@@ -7,7 +7,7 @@ defmodule Mix.Tasks.Renew do
   Creates a new Elixir project.
   It expects the path of the project as argument.
 
-      mix renew PATH [--module MODULE] [--app APP] [--umbrella | --ecto --aqmp --sup --phoenix] [--ci --docker]
+      mix renew PATH [--module MODULE] [--app APP] [--umbrella | --ecto --amqp --sup --phoenix] [--ci --docker]
 
   A project at the given PATH will be created. The
   application name and module name will be retrieved
@@ -46,7 +46,7 @@ defmodule Mix.Tasks.Renew do
   to add Phoenix Framework in the generated code skeleton.
 
   A `--amqp` option can be given in order
-  to add Rabbit MQ client (AQMP) in the generated code skeleton.
+  to add Rabbit MQ client (AMQP) in the generated code skeleton.
 
   ## Examples
 
@@ -72,6 +72,7 @@ defmodule Mix.Tasks.Renew do
     Renew.Generators.Phoenix,
     Renew.Generators.Docker,
     Renew.Generators.CI,
+    Renew.Generators.AMQP,
   ]
 
   @switches [
@@ -265,7 +266,7 @@ defmodule Mix.Tasks.Renew do
       - Ecto database wrapper with <%= @ecto_db %> adapter.<% end %><%= if @phoenix do %>
       - Phoenix Framework
       - Multiverse response compatibility layers<% end %><%= if @amqp do %>
-      - AQMP RabbitMQ wrapper<% end %><%= if @ci do %>
+      - AMQP RabbitMQ wrapper<% end %><%= if @ci do %>
       - Code Coverage, Analysis and Benchmarking tools
       - Setup for Travis-CI Continuous Integration
       - Pre-Commit hooks to keep code clean, run `$ ./bin/install-git-hooks.sh`.<% end %><%= if @docker do %>

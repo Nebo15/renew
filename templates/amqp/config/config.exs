@@ -1,3 +1,10 @@
-config :<%= @application_name %>, <%= @module_name %>.Endpoint,
-  pubsub: [name: <%= @module_name %>.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+# RabbitMQ Config
+config :rbmq, amqp_exchange: "<%= @application_name %>_exchange"
+config :rbmq, prefetch_count: 80
+config :rbmq, amqp_params: [
+  host: "localhost",
+  port: 5672,
+  username: "guest",
+  password: "guest",
+  virtual_host: "/",
+]

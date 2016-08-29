@@ -3,6 +3,7 @@ use Mix.Releases.Config,
   default_environment: :default
 
 environment :default do
+  set pre_start_hook: "bin/hooks/pre-start.sh"
   set dev_mode: false
   set include_erts: false
   set include_src: false

@@ -34,11 +34,13 @@ RUN mix do compile, release --verbose
 
 # Move release to /opt/$APP_NAME
 RUN \
-    mkdir -p $HOME/rel/priv && \
+    mkdir -p $HOME/priv && \
     mkdir -p /opt/$APP_NAME/log && \
+    mkdir -p /var/log && \
     mkdir -p /opt/$APP_NAME/priv && \
     mkdir -p /opt/$APP_NAME/hooks && \
-    cp -R $HOME/rel/priv /opt/$APP_NAME/ && \
+    mkdir -p /opt/$APP_NAME/uploads && \
+    cp -R $HOME/priv /opt/$APP_NAME/ && \
     cp -R $HOME/bin/hooks /opt/$APP_NAME/ && \
     APP_TARBALL=$(find $HOME/rel/$APP_NAME/releases -maxdepth 2 -name ${APP_NAME}.tar.gz) && \
     cp $APP_TARBALL /opt/$APP_NAME/ && \
@@ -47,8 +49,8 @@ RUN \
     rm $APP_NAME.tar.gz && \
     rm -rf /opt/app/* && \
     chmod -R 777 $HOME && \
-    chmod -R 777 /opt/$APP_NAME
-
+    chmod -R 777 /opt/$APP_NAME && \
+    chmod -R 777 /var/log
 
 # Change user to "default"
 USER default
@@ -72,5 +74,6 @@ RUN $APP_NAME/hooks/pre-run.sh
 #    Foreground: <%= @application_name %>/bin/<%= @application_name %> foreground
 #    Daemon: <%= @application_name %>/bin/<%= @application_name %> start<%= if @ecto do %>
 #  Also you can run migrations whenever container starts:
-#    <%= @application_name %>/bin/<%= @application_name %> start --migrate<% end %>
+#    <%= @application_name %>/bin/<%= @application_name %> command <%= @application_name %>_tasks migrate!
+#  Alternatively you can set env APP_MIGRATE=true and APP_RUN_SEED=true when starting container.<% end %>
 CMD $APP_NAME/bin/$APP_NAME <%= if @sup do %>foreground<% else %>console<% end %>

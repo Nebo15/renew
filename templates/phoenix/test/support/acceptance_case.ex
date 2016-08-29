@@ -19,14 +19,18 @@ defmodule <%= @module_name %>.AcceptanceCase do
 
       @endpoint <%= @module_name %>.Endpoint
 
-      @http_port Integer.to_string(Application.get_env(:<%= @application_name %>, <%= @module_name %>.Endpoint)[:http][:port])
-      @http_uri "http://localhost:#{@http_port}/"
-      @metadata_prefix "BeamMetadata"
+      # Configure acceptance testing on different host:port
+      conf = Application.get_env(:<%= @application_name %>, <%= @module_name %>.Endpoint)
+      host = System.get_env("MIX_TEST_HOST") || conf[:http][:host] || "localhost"
+      port = System.get_env("MIX_TEST_PORT") || conf[:http][:port] || 4000
+
+      @http_uri "http://#{host}:#{port}/"
 
       def process_url(url) do
         @http_uri <> url
       end<%= if @ecto do %>
 
+      @metadata_prefix "BeamMetadata"
       defp process_request_headers(headers) do
         meta = Phoenix.Ecto.SQL.Sandbox.metadata_for(<%= @module_name %>.Repo, self())
         encoded = {:v1, meta}
@@ -39,8 +43,10 @@ defmodule <%= @module_name %>.AcceptanceCase do
   end
 
   setup tags do<%= if @ecto do %>
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(<%= @module_name %>.Repo)
+
     unless tags[:async] do
-      :ok = Ecto.Adapters.SQL.Sandbox.checkout(<%= @module_name %>.Repo)
+       Ecto.Adapters.SQL.Sandbox.mode(<%= @module_name %>.Repo, {:shared, self()})
     end<% else %>
     _ = tags<% end %>
     :ok

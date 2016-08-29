@@ -1,7 +1,15 @@
 language: elixir
+<%= if @docker do %>sudo: required<% end %>
 cache:
   directories:
   - deps
+services:<%= if @docker do %>
+  - docker<% end %><%= if @ecto && @ecto_db == "postgres" do %>
+  - postgresql<% end %><%= if @ecto && @ecto_db == "mysql" do %>
+  - mysql<% end %><%= if @amqp do %>
+  - rabbitmq<% end %><%= if @ecto && @ecto_db == "postgres" do %>
+addons:
+  postgresql: "9.5"<% end %>
 elixir:
   - 1.3.0
 otp_release:
@@ -9,17 +17,47 @@ otp_release:
 env:
   global:
     - MIX_ENV=test
+    - DOCKER_HUB_ACCOUNT=place_your_account_name_here
+    # Docker credentials
+    - secure: "..."<%= if @docker do %>
+branches:
+  # Releases are generated automatically, stop infinite build loop
+  except:
+    - /[0-9]*\.[0-9]*\.[0-9]*/<% end %><%= if @ecto do %>
+before_install:
+  # Expose MQ and DB to Docker container
+  - sudo ./bin/ci/init-db.sh<% end %>
 script:
-  # - "./bin/version_increment.sh" # Uncomment this if you want to increment patch version on each Travis build.
+  # Increment version in mix.exs
+  # Uncomment this if you want to increment patch version on each Travis build.
+  # - "./bin/version_increment.sh"
+  # Install dependencies
   - "mix deps.get"
-  - "mix test --trace"
+  # Run all tests except pending ones
+  - "mix test --exclude pending --trace"
+  # Submit code coverage report to Coveralls
+  # Add --pro if you using private repo.
   - "mix coveralls.travis"
+  # Run static code analysis
   - "mix credo"
+  # Check code style
   - "mix dogma"<%= if @docker do %>
-  - "./bin/build.sh"<% end %>
+  # Build Docker container
+  - "./bin/build.sh"
+  # Initialize DB for Docker container
+  - "MIX_ENV=dev mix ecto.setup"
+  # Run Docker container
+  - sudo ./bin/start.sh
+  - sleep 5
+  - docker ps
+  # Run acceptance tests on Docker container
+  - "MIX_TEST_HOST=localhost MIX_TEST_PORT=4000 mix test test/acceptance"<% end %>
 # after_success:<%= if @docker do %>
 
-# Also you can automatically build images and push them to Docker Hub.
+# Also you can
+# - automatically build images and push them to Docker Hub;
+# - create new git tag with build version and GitHub release on it.
+#
 # To do so you need to encrypt your docker user name and password and add to environment variables:
 #
 #   $ travis encrypt DOCKER_USERNAME=sample_username DOCKER_PASSWORD=strong_password
@@ -36,21 +74,6 @@ script:
 #
 # Then uncomment following lines:
 #
-#   - echo "Logging in into Docker Hub";
-#     docker login -u=$DOCKER_USERNAME -p=$DOCKER_PASSWORD;
-#   - echo "Setting Gih user/password";
-#     git config --global user.email "travis@travis-ci.com";
-#     git config --global user.name "Travis-CI";
-#     git config --global push.default upstream;
-#   - if [ "$TRAVIS_PULL_REQUEST" == "false" && $TRAVIS_BRANCH == "master" ]; then
-#       ./bin/release.sh -a $DOCKER_HUB_ACCOUNT -t $TRAVIS_BRANCH -l;
-#     fi;<% end %>
-
-# Uncomment this if you want to push mix.exs with incremented back to origin repo.
-#   - if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
-#       echo "Done. Commiting changes back to repo.";
-#       git add mix.exs;
-#       git commit -m "Increment version [ci skip]";
-#       git push origin HEAD:$TRAVIS_BRANCH;
-#       git push origin --tags;
-#     fi;
+# after_success:
+#   # Submit Docker container to Docker Hub and create GitHub Release by pushing tag with changelog
+#   - ./bin/ci/push.sh<% end %>

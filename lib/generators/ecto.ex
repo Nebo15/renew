@@ -8,6 +8,15 @@ defmodule Renew.Generators.Ecto do
     {:mkdir, "ecto/test/unit/models/",          "test/unit/models/"},
     {:cp, "ecto/test/support/model_case.ex",    "test/support/model_case.ex"},
     {:append, "ecto/.env",                      ".env"},
+    {:append, "ecto/bin/hooks/pre-start.sh",    "bin/hooks/pre-start.sh"},
+  ]
+
+  load_templates :tpl_postgre, [
+    {:cp, "ecto/bin/ci/init-postgres-db.sh",    "bin/ci/init-db.sh"},
+  ]
+
+  load_templates :tpl_mysql, [
+    {:cp, "ecto/bin/ci/init-mysql-db.sh",    "bin/ci/init-db.sh"},
   ]
 
   @deps [
@@ -43,8 +52,14 @@ defmodule Renew.Generators.Ecto do
     {path, assigns}
   end
 
-  def apply_template({path, assigns}) do
-    apply_template @tpl, path, assigns
+  def apply_template({path, %{ecto_db: "postgres"} = assigns}) do
+    apply_template @tpl ++ @tpl_postgre, path, assigns
+
+    {path, assigns}
+  end
+
+  def apply_template({path, %{ecto_db: "mysql"} = assigns}) do
+    apply_template @tpl ++ @tpl_mysql, path, assigns
 
     {path, assigns}
   end

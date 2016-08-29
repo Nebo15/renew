@@ -15,7 +15,10 @@ defmodule <%= @module_name %> do
       # Start the Ecto repository
       supervisor(<%= @module_name %>.Repo, []),<% end %><%= if @phoenix do %>
       # Start the endpoint when the application starts
-      supervisor(<%= @module_name %>.Endpoint, []),<% end %>
+      supervisor(<%= @module_name %>.Endpoint, []),<% end %><%= if @amqp do %>
+      # Start RabbitMQ supervisor and consumer
+      supervisor(Rbmq.SupervisorProducer, []),
+      supervisor(Rbmq.SupervisorConsumer, []),<% end %>
       # Starts a worker by calling: <%= @module_name %>.Worker.start_link(arg1, arg2, arg3)
       # worker(<%= @module_name %>.Worker, [arg1, arg2, arg3]),
     ]

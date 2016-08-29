@@ -6,6 +6,7 @@ defmodule Renew.Generators.Mix do
     {:cp, "mix/LICENSE.md",              "LICENSE.md"},
     {:cp, "mix/.gitignore",              ".gitignore"},
     {:cp, "mix/.env",                    ".env"},
+    {:cp, "mix/bin/hooks/pre-start.sh",  "bin/hooks/pre-start.sh"},
   ]
 
   load_templates :tpl_mix, [
