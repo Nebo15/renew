@@ -16,6 +16,7 @@ defmodule Renew.Generators.Mix do
     {:cp, "mix/config/prod.exs",         "config/prod.exs"},
     {:cp, "mix/mix.exs",                 "mix.exs"},
     {:cp, "mix/lib/lib.ex",              "lib/<%= @application_name %>.ex"},
+    {:cp, "mix/lib/config.ex",           "lib/<%= @application_name %>/config.ex"},
     {:cp, "mix/test/test_helper.exs",    "test/test_helper.exs"},
     {:cp, "mix/test/unit/lib_test.exs",  "test/unit/<%= @application_name %>_test.exs"},
   ]
