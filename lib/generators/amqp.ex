@@ -2,8 +2,8 @@ defmodule Renew.Generators.AMQP do
   import Renew.Generator
 
   load_templates :tpl_ci, [
-    {:cp, "amqp/bin/init-mq.sh", "bin/init-mq.sh"},
-    {:append, "amqp/.env",       ".env"},
+    {:cp, "amqp/bin/ci/init-mq.sh", "bin/ci/init-mq.sh"},
+    {:append, "amqp/.env",          ".env"},
   ]
 
   load_template :config_main, 'amqp/config/config.exs'
