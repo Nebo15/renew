@@ -11,13 +11,15 @@ git config --global user.name "Travis-CI";
 git config --global push.default upstream;
 
 if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
-  if [ $TRAVIS_BRANCH == "master" ]; then
+  if [ $TRAVIS_BRANCH == "$RELEASE_BRANCH" ]; then
     ./bin/release.sh -a $DOCKER_HUB_ACCOUNT -t $TRAVIS_BRANCH -l;
   fi;
 
-  echo "Done. Commiting changes back to repo.";
-  git add mix.exs;
-  git commit -m "Increment version [ci skip]";
-  git push origin HEAD:$TRAVIS_BRANCH;
-  git push origin HEAD:$TRAVIS_BRANCH --tags;
+  if [ $TRAVIS_BRANCH ~= $MAIN_BRANCHES ]; then
+    echo "Done. Commiting changes back to repo.";
+    git add mix.exs;
+    git commit -m "Increment version [ci skip]";
+    git push origin HEAD:$TRAVIS_BRANCH;
+    git push origin HEAD:$TRAVIS_BRANCH --tags;
+  fi;
 fi;

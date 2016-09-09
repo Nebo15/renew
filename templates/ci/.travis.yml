@@ -18,6 +18,8 @@ env:
   global:
     - MIX_ENV=test
     - DOCKER_HUB_ACCOUNT=place_your_account_name_here
+    - MAIN_BRANCHES="master develop staging" # Branches on which you want version to be incremented<%= if @docker do %>
+    - RELEASE_BRANCH="master"<% end %>
     # Docker credentials
     - secure: "..."<%= if @docker do %>
 branches:
