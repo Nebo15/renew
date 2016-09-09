@@ -25,14 +25,16 @@ env:
 branches:
   # Releases are generated automatically, stop infinite build loop
   except:
-    - /[0-9]*\.[0-9]*\.[0-9]*/<% end %><%= if @ecto do %>
-before_install:
+    - /[0-9]*\.[0-9]*\.[0-9]*/<% end %>
+before_install:<%= if @ecto do %>
   # Expose MQ and DB to Docker container
-  - sudo ./bin/ci/init-db.sh<% end %>
-script:
+  - sudo ./bin/ci/init-db.sh<% end %><%= if @amqp do %>
+  # Expose MQ and DB to Docker container
+  - sudo ./bin/ci/init-mq.sh<% end %>
+script:<%= if @docker do %>
   # Increment version in mix.exs
   # Uncomment this if you want to increment patch version on each Travis build.
-  # - "./bin/version_increment.sh"
+  # - "./bin/version-increment.sh"<% end %>
   # Install dependencies
   - "mix deps.get"
   # Run all tests except pending ones
