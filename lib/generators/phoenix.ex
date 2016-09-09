@@ -18,10 +18,6 @@ defmodule Renew.Generators.Phoenix do
     {:cp, "phoenix/test/unit/controllers/page_controller_test.exs", "test/unit/controllers/page_controller_test.exs"},
   ]
 
-  load_templates :tpl_ecto, [
-    {:cp, "phoenix/lib/tasks.ex", "lib/<%= @application_name %>/tasks.ex"},
-  ]
-
   load_template :config_main, 'phoenix/config/config.exs'
   load_template :config_test, 'phoenix/config/test.exs'
   load_template :config_dev,  'phoenix/config/dev.exs'
@@ -89,12 +85,6 @@ defmodule Renew.Generators.Phoenix do
 
   defp apply_ecto_settings(assigns) do
     assigns
-  end
-
-  def apply_template({path, %{ecto: true} = assigns}) do
-    apply_template @tpl ++ @tpl_ecto, path, assigns
-
-    {path, assigns}
   end
 
   def apply_template({path, assigns}) do

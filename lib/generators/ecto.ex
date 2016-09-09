@@ -9,6 +9,7 @@ defmodule Renew.Generators.Ecto do
     {:cp, "ecto/test/support/model_case.ex",    "test/support/model_case.ex"},
     {:append, "ecto/.env",                      ".env"},
     {:append, "ecto/bin/hooks/pre-start.sh",    "bin/hooks/pre-start.sh"},
+    {:cp, "ecto/lib/tasks.ex",                  "lib/<%= @application_name %>/tasks.ex"},
   ]
 
   load_templates :tpl_postgre, [
