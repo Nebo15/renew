@@ -1,7 +1,7 @@
-FROM bitwalker/alpine-erlang:latest
+FROM nebo15/alpine-erlang:latest
 
 # Maintainers
-MAINTAINER Nebo#15 @nebo15
+MAINTAINER Nebo#15 support@nebo15.com
 
 # Configure environment variables and other settings
 ENV TERM=xterm \
