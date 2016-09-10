@@ -1,22 +1,66 @@
 # Renew
 
-This module adds ```mix renew``` task that imports our base folder structure. Usage is very similar to `mix new` except custom enhancements that we used to do.
+This is a universal project generator that grow out of Nebo #15 requirements:
 
-## What has changed?
+  - We use micro-service architecture, so we used to have many projects that start with a same boilerplate that differs by included features.
+  - We want our code to have same style.
+  - And we want to have it covered with tests.
+  - We follow [the twelve-factor methodology](https://12factor.net/), especially we are trying to use environment variables in all application configurations. This allows us to build Docker containers and use them in different environments. In this way we can be sure that everything works on production in a same way as in environment where we test our products.
+  - We use Docker since it allows to deploy binaries and run acceptance/performance tests against them in a release cycle.
+  - We use Travis-CI to run tests and to build Docker containers.
+  - We use Kubernetes clusters with many docker containers inside.
+  - We want Docker containers be as small as possible, Apline Linux is the best for it.
+  - We use Ecto and Phoenix (only in places where we need them), also we use RabbitMQ to guarantee message processing.
 
-We trying to have our projects consistent, so some other small changes are made:
-- `.gitignore` will ignore release and editor specific files.
-- `LICENSE.md` will also be generated, since we want to add it to all our repos.
-- `mix.exs` will have appropriate structure for HEX package manager and `ex_doc` dependency.
-- `.dockerignore` will make sure that no unnecessary scripts will be packaged into container.
+So it includes:
 
-### Deployment
+  - [Distillery](https://github.com/bitwalker/distillery) release manager.
+  - [Confex](https://github.com/nebo15/confex) environment variables helper.
+  - [Ecto](https://github.com/elixir-ecto/ecto) database wrapper with PostreSQL and MySQL adapters.
+  - [Phoenix Framework](http://phoenixframework.org/).
+  - [Multiverse](http://github.com/Nebo15/multiverse/) response compatibility layers.
+  - [RBMQ](https://github.com/Nebo15/rbmq) RabbitMQ wrapper.
+  - Code Coverage, Analysis and Benchmarking tools:
 
-The biggest addition is deployment tools that we use.
+    - [Benchfella](https://github.com/alco/benchfella) - Microbenchmarking tool.
+    - [ExCoveralls](https://github.com/parroty/excoveralls) - Coverage report tool with coveralls.io integration.
+    - [Dogma](https://github.com/lpil/dogma) - A code style linter.
+    - [Credo](https://github.com/rrrene/credo) - A static code analysis tool with a focus on code consistency and teaching.
 
-`mix.exs` will include [Distillery](https://github.com/bitwalker/distillery) as release management tool. It will be used in `Dockerfile` to build project into a Docker container.
+  - Setup for [Travis-CI](http://travis-ci.org/) Continuous Integration. And many scripts that makes simpler to work with it.
+  - Pre-Commit hooks to keep code clean.
+  - Docker container configuration and helper scripts.
 
-`Dockerfile` needs enhancements, so take look in it's source. Usually you need to expose some ports to talk to a container, and change `ENTRYPOINT` of your application.
+
+## Installation
+
+Install this package globally:
+
+  ```
+  mix archive.install https://github.com/Nebo15/renew/releases/download/0.11.0/renew.ez
+  ```
+
+## Usage
+
+Usage is very similar to `mix new`, but with many additional feature flags:
+
+  - `docker` - include Docker setup.
+  - `ci` - include Travis-Ci setup.
+  - `ecto` and `ecto_db` - include Ecto adapter.
+  - `amqp` - include RBMQ setup.
+  - `phoenix` - include Phoenix setup.
+
+Run `renew` mix task to create new projects:
+
+  ```
+  mix renew myapp --ecto --ci --docker --phoenix
+  ```
+
+You can get more info in [renew mix task](https://github.com/Nebo15/renew/blob/master/lib/mix/renew.ex#L10).
+
+### Docker Helpers
+
+`Dockerfile` needs enhancements, so take look in it's source. Sometimes you need to expose some ports to talk to a container, and change `CMD` of your application.
 
 There are `./bin/build.sh` script that removes routine in building container for production.
   ```
@@ -29,32 +73,35 @@ There are `./bin/build.sh` script that removes routine in building container for
   Successfully built eae970501b13
   ```
 
+Another one is `./bin/start.sh` that will run your app in detached mode.
+
 ### Environment variables
 
 Use `${ENV_VAR}` inside `config/config.exs` since Distillery is configured to replace OS vars on each run of application.
 
   ```
-  config :myapp, :myapp,
+  config :myapp, :mykey,
     db_user: "${DB_USER}"
   ```
 
+When configuring your code you can also use Confex and `{:system, VAR_NAME, default_value}` tuples:
+
+  ```
+  config :myapp, :mykey,
+    somevar: {:system, "MY_VAR_NAME", "default"}
+  ```
+
+  and read it later:
+
+  ```
+  Confex.get_map(:myapp, :mykey)
+  ```
+
 Later you can start Docker container passing `.env` file to set appropriate configuration of your application:
+
   ```
   $ docker run --env-file .env [rest..]
   ```
-
-### Testing and CI
-
-We love TDD, so following dependencies are added by default:
-
-  - [Benchfella](https://github.com/alco/benchfella) - Microbenchmarking tool.
-  - [ExCoveralls](https://github.com/parroty/excoveralls) - Coverage report tool with coveralls.io integration.
-  - [Dogma](https://github.com/lpil/dogma) - A code style linter.
-  - [Credo](https://github.com/rrrene/credo) - A static code analysis tool with a focus on code consistency and teaching.
-
-All this tools supplied with custom configuration.
-
-Take look at [Travis-CI](https://travis-ci.org/). It will make sure that all tests passing on each commit and pull request.
 
 ### Migrations
 
@@ -62,23 +109,7 @@ Whenever you make a release for your app you can't use mix anymore, but you stil
 
 Your migrations will be preserved within container in `./priv/repo` folder.
 
-## Installation
-
-Install this package globally:
-
-  ```
-  mix archive.install https://github.com/Nebo15/renew/releases/download/0.11.0/renew.ez
-  ```
-
-## Usage
-
-You need to use `renew` task to create new projects:
-
-  ```
-  mix renew myapp
-  ```
-
-See [Mix.Tasks.New](http://elixir-lang.org/docs/stable/mix/Mix.Tasks.New.html) for additional documentation.
+To run a migration set `APP_RUN_SEED=true` and `APP_MIGRATE=true` in your environment.
 
 ## Useful links
 
