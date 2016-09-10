@@ -17,8 +17,9 @@ defmodule <%= @module_name %> do
       # Start the endpoint when the application starts
       supervisor(<%= @module_name %>.Endpoint, []),<% end %><%= if @amqp do %>
       # Start RabbitMQ supervisor and consumer
-      supervisor(Rbmq.SupervisorProducer, []),
-      supervisor(Rbmq.SupervisorConsumer, []),<% end %>
+      supervisor(<%= @module_name %>.AMQP.Connection, []),
+      supervisor(<%= @module_name %>.AMQP.Producer, []),
+      supervisor(<%= @module_name %>.AMQP.Consumer, []),<% end %>
       # Starts a worker by calling: <%= @module_name %>.Worker.start_link(arg1, arg2, arg3)
       # worker(<%= @module_name %>.Worker, [arg1, arg2, arg3]),
     ]

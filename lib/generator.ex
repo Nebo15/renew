@@ -53,7 +53,7 @@ defmodule Renew.Generator do
 
   def add_test_config(assigns, add) when is_binary(add) do
     {_, assigns} = Map.get_and_update(assigns, :config_test, fn config_test ->
-      conf = config_test <> "\n" <> add
+      conf = config_test <> "\n\n" <> add
       |> String.trim_trailing
 
       {config_test, conf}
@@ -64,7 +64,7 @@ defmodule Renew.Generator do
 
   def add_dev_config(assigns, add) when is_binary(add) do
     {_, assigns} = Map.get_and_update(assigns, :config_dev, fn config_dev ->
-      conf = config_dev <> "\n" <> add
+      conf = config_dev <> "\n\n" <> add
       |> String.trim_trailing
 
       {config_dev, conf}
@@ -75,7 +75,7 @@ defmodule Renew.Generator do
 
   def add_prod_config(assigns, add) when is_binary(add) do
     {_, assigns} = Map.get_and_update(assigns, :config_prod, fn config_prod ->
-      conf = config_prod <> "\n" <> add
+      conf = config_prod <> "\n\n" <> add
       |> String.trim_trailing
 
       {config_prod, conf}
@@ -86,7 +86,7 @@ defmodule Renew.Generator do
 
   def add_project_dependencies(assigns, add) when is_list(add) do
     {_, assigns} = Map.get_and_update(assigns, :project_dependencies, fn project_dependencies ->
-      {project_dependencies, project_dependencies ++ add}
+      {project_dependencies, Enum.uniq(project_dependencies ++ add)}
     end)
 
     assigns
@@ -94,7 +94,7 @@ defmodule Renew.Generator do
 
   def add_project_settings(assigns, add) when is_list(add) do
     {_, assigns} = Map.get_and_update(assigns, :project_settings, fn project_settings ->
-      {project_settings, project_settings ++ add}
+      {project_settings, Enum.uniq(project_settings ++ add)}
     end)
 
     assigns
@@ -102,7 +102,7 @@ defmodule Renew.Generator do
 
   def add_project_compilers(assigns, add) when is_list(add) do
     {_, assigns} = Map.get_and_update(assigns, :project_compilers, fn project_compilers ->
-      {project_compilers, project_compilers ++ add}
+      {project_compilers, Enum.uniq(project_compilers ++ add)}
     end)
 
     assigns
@@ -110,7 +110,7 @@ defmodule Renew.Generator do
 
   def add_project_applications(assigns, add) when is_list(add) do
     {_, assigns} = Map.get_and_update(assigns, :project_applications, fn project_applications ->
-      {project_applications, project_applications ++ add}
+      {project_applications, Enum.uniq(project_applications ++ add)}
     end)
 
     assigns
@@ -209,11 +209,39 @@ defmodule Renew.Generator do
         [] ->
           {project_applications, ""}
         _ ->
-          {project_applications, ", " <> Enum.join(project_applications, ", ")}
+          {project_applications, ", " <> pretty_join(project_applications)}
       end
     end)
 
     assigns
+  end
+
+  defp pretty_join(enumerable) do
+    reduced = Enum.reduce(enumerable, :first, fn
+      entry, :first -> entry
+      entry, acc ->
+        [acc, get_joining_splitter(acc) | entry]
+    end)
+
+    if reduced == :first do
+      ""
+    else
+      IO.iodata_to_binary reduced
+    end
+  end
+
+  defp get_joining_splitter(acc) when is_binary(acc) do
+    ", "
+  end
+
+  defp get_joining_splitter(acc) do
+    case rem(IO.iodata_length(acc), 50) > 40 do
+      true ->
+        ",\n                    "
+
+      _ ->
+        ", "
+    end
   end
 
   defp convert_project_compilers(assigns) do

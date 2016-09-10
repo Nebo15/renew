@@ -30,7 +30,7 @@ defmodule Renew.Generators.Phoenix do
   @deps [
     ~S({:cowboy, "~> 1.0"}),
     ~S({:httpoison, "~> 0.9.0"}),
-    ~S({:poison, "~> 2.0"}),
+    ~S({:poison, "~> 2.2"}),
     ~S({:phoenix, "~> 1.2.0"}),
     ~S({:ex_json_schema, "~> 0.5"}),
     ~S({:timex, "~> 3.0"}),

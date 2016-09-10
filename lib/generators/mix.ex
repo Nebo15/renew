@@ -16,9 +16,16 @@ defmodule Renew.Generators.Mix do
     {:cp, "mix/config/prod.exs",         "config/prod.exs"},
     {:cp, "mix/mix.exs",                 "mix.exs"},
     {:cp, "mix/lib/lib.ex",              "lib/<%= @application_name %>.ex"},
-    {:cp, "mix/lib/config.ex",           "lib/<%= @application_name %>/config.ex"},
     {:cp, "mix/test/test_helper.exs",    "test/test_helper.exs"},
     {:cp, "mix/test/unit/lib_test.exs",  "test/unit/<%= @application_name %>_test.exs"},
+  ]
+
+  @deps [
+    ~S({:confex, "~> 1.4"}),
+  ]
+
+  @apps [
+    ~S(:confex),
   ]
 
   load_templates :tpl_release, [
@@ -45,13 +52,16 @@ defmodule Renew.Generators.Mix do
   def apply_settings({path, %{in_umbrella: true} = assigns}) do
     assigns = assigns
     |> add_project_settings(@project_settings_in_umbrella)
+    |> add_project_dependencies(@deps)
+    |> add_project_applications(@apps)
 
     {path, assigns}
   end
 
   def apply_settings({path, assigns}) do
     assigns = assigns
-    |> add_project_dependencies(@deps_release)
+    |> add_project_dependencies(@deps_release ++ @deps)
+    |> add_project_applications(@apps)
 
     {path, assigns}
   end

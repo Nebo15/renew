@@ -247,7 +247,8 @@ defmodule Mix.Tasks.Renew do
     Starting generation of Elixir umbrella project..
 
     Your settings will include:
-      - Distillery release manager<%= if @ci do %>
+      - Distillery release manager
+      - Confex environment variables helper<%= if @ci do %>
       - Code Coverage, Analysis and Benchmarking tools
       - Setup for Travis-CI Continuous Integration<% end %><%= if @docker do %>
       - Docker container build config and scripts<% end %>
@@ -260,7 +261,8 @@ defmodule Mix.Tasks.Renew do
     Starting generation of Elixir project..
 
     Your settings will include:
-      - Distillery release manager<%= if @in_umbrella do %>
+      - Distillery release manager
+      - Confex environment variables helper<%= if @in_umbrella do %>
       - Parent umbrella application bindings<% end %><%= if @sup do %>
       - Application supervisor<% end %><%= if @ecto do %>
       - Ecto database wrapper with <%= @ecto_db %> adapter.<% end %><%= if @phoenix do %>

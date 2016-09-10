@@ -1,24 +1,24 @@
 defmodule Renew.Generators.AMQP do
   import Renew.Generator
 
-  load_templates :tpl_ci, [
-    {:cp, "amqp/bin/ci/init-mq.sh", "bin/ci/init-mq.sh"},
-    {:append, "amqp/.env",          ".env"},
+  load_templates :tpl_amqp, [
+    {:cp, "amqp/bin/ci/init-mq.sh",      "bin/ci/init-mq.sh"},
+    {:cp, "amqp/lib/amqp/connection.ex", "lib/amqp/connection.ex"},
+    {:cp, "amqp/lib/amqp/producer.ex",   "lib/amqp/producer.ex"},
+    {:cp, "amqp/lib/amqp/consumer.ex",   "lib/amqp/consumer.ex"},
+    {:append, "amqp/.env",               ".env"},
   ]
 
   load_template :config_main, 'amqp/config/config.exs'
-  load_template :config_prod, 'amqp/config/prod.exs'
 
   @deps [
-    ~S({:rbmq, "~> 0.2"}),
-    ~S({:amqp_client, git: "https://github.com/dsrosario/amqp_client.git", branch: "erlang_otp_19", override: true}),
-    ~S({:amqp, "0.1.4"}),
+    ~S({:rbmq, git: "https://github.com/Nebo15/rbmq.git", branch: "master", override: true}),
+    ~S({:poison, "~> 2.2"})
   ]
 
   @apps [
-    ~S(:amqp),
-    ~S(:amqp_client),
     ~S(:rbmq),
+    ~S(:poison),
   ]
 
   def apply?(assigns) do
@@ -26,19 +26,18 @@ defmodule Renew.Generators.AMQP do
   end
 
   def apply_settings({path, assigns}) do
-    {config, config_prod} = get_config(assigns)
+    config = get_config(assigns)
 
     assigns = assigns
     |> add_project_dependencies(@deps)
     |> add_project_applications(@apps)
     |> add_config(config)
-    |> add_prod_config(config_prod)
 
     {path, assigns}
   end
 
-  def apply_template({path, %{ci: true} = assigns}) do
-    apply_template @tpl_ci, path, assigns
+  def apply_template({path, %{amqp: true} = assigns}) do
+    apply_template @tpl_amqp, path, assigns
 
     {path, assigns}
   end
@@ -48,12 +47,7 @@ defmodule Renew.Generators.AMQP do
   end
 
   defp get_config(assigns) do
-    config = @config_main
+    @config_main
     |> eval_template(assigns)
-
-    config_prod = @config_prod
-    |> eval_template(assigns)
-
-    {config, config_prod}
   end
 end

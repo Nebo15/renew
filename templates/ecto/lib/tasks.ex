@@ -10,15 +10,16 @@ defmodule :<%= @application_name %>_tasks do
   import Mix.Ecto
 
   @priv_dir "priv"
+  @repo <%= @module_name %>.Repo
 
   def migrate! do
     # Migrate
     migrations_dir = Path.join([@priv_dir, "repo", "migrations"])
 
-    repo = start_repo(<%= @module_name %>.Repo)
-
     # Run migrations
-    Ecto.Migrator.run(repo, migrations_dir, :up, all: true)
+    @repo
+    |> start_repo
+    |> Ecto.Migrator.run(migrations_dir, :up, all: true)
 
     System.halt(0)
     :init.stop()
@@ -28,7 +29,7 @@ defmodule :<%= @application_name %>_tasks do
     seed_script = Path.join([@priv_dir, "repo", "seeds.exs"])
 
     # Run seed script
-    repo = start_repo(<%= @module_name %>.Repo)
+    repo = start_repo(@repo)
 
     Code.require_file(seed_script)
 
@@ -37,8 +38,9 @@ defmodule :<%= @application_name %>_tasks do
   end
 
   defp start_repo(repo) do
-    load_app()
-    repo.start_link()
+    load_app
+    # If you don't include Repo in application supervisor start it here manually
+    # repo.start_link()
     repo
   end
 
@@ -49,7 +51,7 @@ defmodule :<%= @application_name %>_tasks do
 
   defp start_applications(apps) do
     Enum.each(apps, fn app ->
-      {_ , message } = Application.ensure_all_started(app)
+      {_, _message} = Application.ensure_all_started(app)
     end)
   end
 end
