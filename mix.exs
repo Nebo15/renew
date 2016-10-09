@@ -1,7 +1,7 @@
 defmodule Renew.Mixfile do
   use Mix.Project
 
-  @version "0.10.2"
+  @version "0.12.4"
 
   def project do
     [app: :renew,
