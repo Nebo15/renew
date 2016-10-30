@@ -139,6 +139,7 @@ defmodule Mix.Tasks.Renew do
             config_test: "",
             config_dev: "",
             config_prod: "",
+            erlang_cookie: random_string(64),
             secret_key_base: random_string(64),
             secret_key_base_prod: random_string(64),
             signing_salt: random_string(8),

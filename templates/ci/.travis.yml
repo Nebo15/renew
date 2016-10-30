@@ -19,9 +19,9 @@ env:
     - MIX_ENV=test
     - DOCKER_HUB_ACCOUNT=place_your_account_name_here
     - MAIN_BRANCHES="master develop staging" # Branches on which you want version to be incremented<%= if @docker do %>
-    - RELEASE_BRANCH="master"<% end %>
+    - RELEASE_BRANCH="master"<% end %><%= if @docker do %>
     # Docker credentials
-    - secure: "..."<%= if @docker do %>
+    - secure: "..."
 branches:
   # Releases are generated automatically, stop infinite build loop
   except:
@@ -55,7 +55,7 @@ script:<%= if @docker do %>
   - sleep 5
   - docker ps
   - RUNNING_CONTAINERS=`docker ps | wc -l`;
-  - if [ "${RUNNING_CONTAINERS//[[:space:]]/}" == "1" ]; then echo "[E] Container is not started!" exit 1; fi;
+  - if [ "${RUNNING_CONTAINERS//[[:space:]]/}" = "1" ]; then echo "[E] Container is not started!" exit 1; fi;
   # Run acceptance tests on Docker container
   - "MIX_TEST_HOST=localhost MIX_TEST_PORT=4000 mix test test/acceptance"<% end %>
 # after_success:<%= if @docker do %>

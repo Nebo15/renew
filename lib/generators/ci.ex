@@ -14,8 +14,8 @@ defmodule Renew.Generators.CI do
     ~S({:benchfella, "~> 0.3", only: [:dev, :test]}),
     ~S({:ex_doc, ">= 0.0.0", only: [:dev, :test]}),
     ~S({:excoveralls, "~> 0.5", only: [:dev, :test]}),
-    ~S({:dogma, "> 0.1.0", only: [:dev, :test]}),
-    ~S({:credo, ">= 0.4.8", only: [:dev, :test]}),
+    ~S({:dogma, "~> 0.1.12", only: [:dev, :test]}),
+    ~S({:credo, ">= 0.5.1", only: [:dev, :test]}),
   ]
 
   @project_settings [

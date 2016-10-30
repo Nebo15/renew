@@ -6,7 +6,7 @@ defmodule <%= @module_name %>.Endpoint do
   use Phoenix.Endpoint, otp_app: :<%= @application_name %><%= if @ecto do %>
 
   # Allow acceptance tests to run in concurrent mode
-  if Application.get_env(:concurrent_acceptance, :sql_sandbox) do
+  if Application.get_env(:<%= @application_name %>, :sql_sandbox) do
     plug Phoenix.Ecto.SQL.Sandbox
   end<%= end %>
 
@@ -18,6 +18,9 @@ defmodule <%= @module_name %>.Endpoint do
 
   plug Plug.RequestId
   plug Plug.Logger
+
+  plug EView
+  plug EView.IdempotencyPlug
 
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],

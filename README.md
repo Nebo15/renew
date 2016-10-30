@@ -4,6 +4,7 @@ This is a universal project generator that grow out of Nebo #15 requirements:
 
   - We use micro-service architecture, so we used to have many projects that start with a same boilerplate that differs by included features.
   - We want our code to have same style.
+  - We want our API responses [to have same logic](http://docs.apimanifest.apiary.io/#) in all our products.
   - And we want to have it covered with tests.
   - We follow [the twelve-factor methodology](https://12factor.net/), especially we are trying to use environment variables in all application configurations. This allows us to build Docker containers and use them in different environments. In this way we can be sure that everything works on production in a same way as in environment where we test our products.
   - We use Docker since it allows to deploy binaries and run acceptance/performance tests against them in a release cycle.
@@ -20,6 +21,7 @@ So it includes:
   - [Phoenix Framework](http://phoenixframework.org/).
   - [Multiverse](http://github.com/Nebo15/multiverse/) response compatibility layers.
   - [RBMQ](https://github.com/Nebo15/rbmq) RabbitMQ wrapper.
+  - [EView](https://github.com/Nebo15/eview) Phoenix response and views wrapper.
   - Code Coverage, Analysis and Benchmarking tools:
 
     - [Benchfella](https://github.com/alco/benchfella) - Microbenchmarking tool.
@@ -37,7 +39,7 @@ So it includes:
 Install this package globally:
 
   ```
-  mix archive.install https://github.com/Nebo15/renew/releases/download/0.12.4/renew.ez
+  mix archive.install https://github.com/Nebo15/renew/releases/download/0.13.0/renew.ez
   ```
 
 ## Usage

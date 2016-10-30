@@ -21,7 +21,7 @@ defmodule Renew.Generators.Ecto do
   ]
 
   @deps [
-    ~S({:ecto, "~> 2.0"}),
+    ~S({:ecto, "~> 2.1.0-rc.3"}),
   ]
 
   @apps [
@@ -66,13 +66,13 @@ defmodule Renew.Generators.Ecto do
   end
 
   def get_adapter("mysql", app, module) do
-    {~S({:mariaex, "~> 0.7.7"}),
+    {~S({:mariaex, "~> 0.7.8"}),
      ~S(:mariaex),
      db_config(app, module, ~S(Ecto.Adapters.MySQL), "root", "")}
   end
 
   def get_adapter("postgres", app, module) do
-    {~S({:postgrex, "~> 0.11.2"}),
+    {~S({:postgrex, "~> 0.12.0"}),
      ~S(:postgrex),
      db_config(app, module, ~S(Ecto.Adapters.Postgres), "postgres", "postgres")}
   end

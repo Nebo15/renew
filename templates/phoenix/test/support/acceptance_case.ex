@@ -9,7 +9,7 @@ defmodule <%= @module_name %>.AcceptanceCase do
 
   using do
     quote do<%= if @ecto do %>
-      import Ecto.Model
+      import Ecto
       import Ecto.Query, only: [from: 2]<% end %>
       import <%= @module_name %>.Router.Helpers
 

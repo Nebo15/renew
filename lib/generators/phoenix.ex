@@ -29,17 +29,16 @@ defmodule Renew.Generators.Phoenix do
 
   @deps [
     ~S({:cowboy, "~> 1.0"}),
-    ~S({:httpoison, "~> 0.9.0"}),
-    ~S({:poison, "~> 2.2"}),
+    ~S({:httpoison, "~> 0.9.2"}),
+    ~S({:poison, "~> 2.0"}),
     ~S({:phoenix, "~> 1.2.0"}),
-    ~S({:ex_json_schema, "~> 0.5"}),
     ~S({:timex, "~> 3.0"}),
     ~S({:multiverse, "~> 0.4.1"}),
+    ~S({:eview, "~> 0.2.5"}),
   ]
 
   @deps_ecto [
-    ~S({:timex_ecto, "~> 3.0"}),
-    ~S({:phoenix_ecto, "~> 3.0"}),
+    ~S({:phoenix_ecto, "~> 3.1.0-rc.0"}),
   ]
 
   @apps [
@@ -49,11 +48,10 @@ defmodule Renew.Generators.Phoenix do
     ~S(:phoenix),
     ~S(:timex),
     ~S(:multiverse),
-    ~S(:ex_json_schema),
+    ~S(:eview),
   ]
 
   @apps_ecto [
-    ~S(:timex_ecto),
     ~S(:phoenix_ecto),
   ]
 

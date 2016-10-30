@@ -33,7 +33,7 @@ defmodule Renew.Generators.Mix do
   ]
 
   @deps_release [
-    ~S({:distillery, "~> 0.9"}),
+    ~S({:distillery, "~> 0.10"}),
   ]
 
   load_templates :tpl_umbrella, [

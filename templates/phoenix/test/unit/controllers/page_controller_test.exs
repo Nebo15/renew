@@ -3,6 +3,20 @@ defmodule <%= @module_name %>.PageControllerTest do
 
   test "GET /page", %{conn: conn} do
     conn = get conn, "/page"
-    assert response(conn, 200) =~ ~S({"page":{"detail":"This is page."}})
+
+    assert %{
+      "meta" => %{
+        "url" => _,
+        "type" => "object",
+        "request_id" => _,
+        "code" => 200
+      },
+      "data" => %{
+        "page" => %{
+          "detail" => "This is page."
+        },
+        "type" => "page"
+      }
+    } = conn |> response(200) |> Poison.decode!
   end
 end
