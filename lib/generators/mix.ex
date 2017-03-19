@@ -26,6 +26,7 @@ defmodule Renew.Generators.Mix do
 
   @apps [
     ~S(:confex),
+    ~S(:runtime_tools),
   ]
 
   load_templates :tpl_release, [

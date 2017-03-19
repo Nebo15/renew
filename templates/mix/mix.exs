@@ -25,12 +25,12 @@ defmodule <%= @module_name %>.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger<%= @project_applications %>]<%= @project_start_module %>]
+    [extra_applications: [:logger<%= @project_applications %>]<%= @project_start_module %>]
   end
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["lib", "web", "test/support"]
-  defp elixirc_paths(_),     do: ["lib", "web"]
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_),     do: ["lib"]
 
   # Dependencies can be Hex packages:
   #
