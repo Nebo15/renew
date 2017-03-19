@@ -6,8 +6,7 @@ defmodule :<%= @application_name %>_tasks do
 
       <%= @application_name %>/bin/<%= @application_name %> command <%= @application_name %>_tasks migrate!
   """
-
-  import Mix.Ecto
+  import Mix.Ecto, warn: false
 
   @priv_dir "priv"
   @repo <%= @module_name %>.Repo
@@ -18,7 +17,7 @@ defmodule :<%= @application_name %>_tasks do
 
     # Run migrations
     @repo
-    |> start_repo
+    |> start_repo()
     |> Ecto.Migrator.run(migrations_dir, :up, all: true)
 
     System.halt(0)
@@ -29,7 +28,7 @@ defmodule :<%= @application_name %>_tasks do
     seed_script = Path.join([@priv_dir, "repo", "seeds.exs"])
 
     # Run seed script
-    repo = start_repo(@repo)
+    start_repo(@repo)
 
     Code.require_file(seed_script)
 
@@ -38,9 +37,8 @@ defmodule :<%= @application_name %>_tasks do
   end
 
   defp start_repo(repo) do
-    load_app
-    # If you don't include Repo in application supervisor start it here manually
-    # repo.start_link()
+    load_app()
+    {:ok, _} = repo.start_link()
     repo
   end
 

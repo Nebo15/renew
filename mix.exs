@@ -6,7 +6,7 @@ defmodule Renew.Mixfile do
   def project do
     [app: :renew,
      description: "Mix task to create Nebo #15 base mix projects that builds into Docker containers.",
-     package: package,
+     package: package(),
      version: @version,
      elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,

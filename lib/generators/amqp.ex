@@ -12,8 +12,8 @@ defmodule Renew.Generators.AMQP do
   load_template :config_main, 'amqp/config/config.exs'
 
   @deps [
-    ~S({:rbmq, git: "https://github.com/Nebo15/rbmq.git", branch: "master", override: true}),
-    ~S({:poison, "~> 2.2"})
+    ~S({:rbmq, "~> 0.3.0"}),
+    ~S({:poison, "~> 3.1"})
   ]
 
   @apps [

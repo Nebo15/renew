@@ -6,7 +6,7 @@ defmodule <%= @module_name %>.Mixfile do
   def project do
     [app: :<%= @application_name %>,<%= if !@umbrella do %>
      description: "Add description to your package.",
-     package: package,<% end %>
+     package: package(),<% end %>
      version: @version,
      elixir: "~> <%= @elixir_version %>",
      elixirc_paths: elixirc_paths(Mix.env),<%= if @project_compilers do %>

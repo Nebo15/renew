@@ -11,10 +11,10 @@ defmodule Renew.Generators.CI do
   ]
 
   @deps [
-    ~S({:benchfella, "~> 0.3", only: [:dev, :test]}),
-    ~S({:ex_doc, ">= 0.0.0", only: [:dev, :test]}),
-    ~S({:excoveralls, "~> 0.5", only: [:dev, :test]}),
-    ~S({:dogma, "~> 0.1.12", only: [:dev, :test]}),
+    ~S({:benchfella, ">= 0.3.4", only: [:dev, :test]}),
+    ~S({:ex_doc, ">= 0.15.0", only: [:dev, :test]}),
+    ~S({:excoveralls, ">= 0.5", only: [:dev, :test]}),
+    ~S({:dogma, ">= 0.1.12", only: [:dev, :test]}),
     ~S({:credo, ">= 0.5.1", only: [:dev, :test]}),
   ]
 

@@ -16,7 +16,7 @@ defmodule Renew.Generator do
   end
 
   defmacro load_templates(name, templates) do
-    quote bind_quoted: binding do
+    quote bind_quoted: binding() do
 
       tmp = templates
       |> Enum.map(fn ({action, source, destination}) ->
@@ -35,7 +35,7 @@ defmodule Renew.Generator do
   end
 
   defmacro load_template(name, file) do
-    quote bind_quoted: binding do
+    quote bind_quoted: binding() do
       Module.put_attribute __MODULE__, name, get_template_source(file)
     end
   end

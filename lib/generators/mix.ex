@@ -15,7 +15,7 @@ defmodule Renew.Generators.Mix do
     {:cp, "mix/config/test.exs",         "config/test.exs"},
     {:cp, "mix/config/prod.exs",         "config/prod.exs"},
     {:cp, "mix/mix.exs",                 "mix.exs"},
-    {:cp, "mix/lib/lib.ex",              "lib/<%= @application_name %>.ex"},
+    {:cp, "mix/lib/application.ex",      "lib/<%= @application_name %>/application.ex"},
     {:cp, "mix/test/test_helper.exs",    "test/test_helper.exs"},
     {:cp, "mix/test/unit/lib_test.exs",  "test/unit/<%= @application_name %>_test.exs"},
   ]
@@ -34,7 +34,7 @@ defmodule Renew.Generators.Mix do
   ]
 
   @deps_release [
-    ~S({:distillery, "~> 0.10"}),
+    ~S({:distillery, "~> 1.2"}),
   ]
 
   load_templates :tpl_umbrella, [
