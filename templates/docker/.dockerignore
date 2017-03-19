@@ -7,24 +7,19 @@ deps
 # If you run "mix test --cover", coverage assets end up here.
 cover
 
-# Ignore released binaries
-rel/<%= @application_name %>
-
 # If the VM crashes, it generates a dump, let's ignore it too.
 erl_crash.dump
 
 # Ignore any node modules, as they should be fetched within container
 node_modules
 
-# Ignore static files
-priv/static/*
-
 # Ignore Phoenix uploads in dev env
-uploads/files/*
+uploads/*
 
 # Ignore git artifacts
 .git
 .gitignore
+.gitmodules
 
 # Ignore Docker artifacts
 Dockerfile
@@ -33,3 +28,12 @@ Dockerfile
 # Ignore markdown description
 README.md
 LICENSE.md
+
+# Ignore other CI configuration and scripts
+coveralls.json
+.env
+.travis.yml
+bin/ci
+bin/build.sh
+bin/install-git-hooks.sh
+bin/start.sh

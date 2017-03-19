@@ -1,5 +1,5 @@
 #!/bin/bash
-# This setup works with Tavis-CI.
+# This setup works with Travis-CI.
 # You need to specify $DOCKER_HUB_ACCOUNT, $DOCKER_USERNAME and $DOCKER_PASSWORD before using this script.
 
 echo "Logging in into Docker Hub";
@@ -10,9 +10,14 @@ git config --global user.email "travis@travis-ci.com";
 git config --global user.name "Travis-CI";
 git config --global push.default upstream;
 
+# When you use Travis-CI with public repos, you need to add user token so Travis will be able to push tags bag to repo.
+# After enabling this, dont forget to set $GITHUB_TOKEN and replace `origin` to `upstream` on lines 27-28.
+# REPO_URL="https://$GITHUB_TOKEN@github.com/$TRAVIS_REPO_SLUG.git";
+# git remote add upstream $REPO_URL &> /dev/null
+
 if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
   if [ "$TRAVIS_BRANCH" == "$RELEASE_BRANCH" ]; then
-    ./bin/release.sh -a $DOCKER_HUB_ACCOUNT -t $TRAVIS_BRANCH -l;
+    ./bin/ci/release.sh -a $DOCKER_HUB_ACCOUNT -t $TRAVIS_BRANCH -l;
   fi;
 
   if [[ "$MAIN_BRANCHES" =~ "$TRAVIS_BRANCH" ]]; then

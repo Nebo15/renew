@@ -40,6 +40,9 @@ RUN \
     chmod -R 777 /opt/$APP_NAME && \
     chmod -R 777 /var/log
 
+# If you want to start distributed nodes uncomment this line
+# RUN epmd -daemon
+
 # Change user to "default"
 USER default
 
@@ -56,12 +59,6 @@ WORKDIR /opt
 # All Docker hooks should be located in bin/hooks directory.
 RUN $APP_NAME/hooks/pre-run.sh
 
-# The command to run when this image starts up
-#  You can run it in one of the following ways:
-#    Interactive: <%= @application_name %>/bin/<%= @application_name %> console
-#    Foreground: <%= @application_name %>/bin/<%= @application_name %> foreground
-#    Daemon: <%= @application_name %>/bin/<%= @application_name %> start<%= if @ecto do %>
-#  Also you can run migrations whenever container starts:
-#    <%= @application_name %>/bin/<%= @application_name %> command <%= @application_name %>_tasks migrate!
-#  Alternatively you can set env APP_MIGRATE=true and APP_RUN_SEED=true when starting container.<% end %>
+# The command to run when this image starts up.<%= if @ecto do %>
+# To run migrations on start set APP_MIGRATE=true env when starting container.<% end %>
 CMD $APP_NAME/bin/$APP_NAME <%= if @sup do %>foreground<% else %>console<% end %>

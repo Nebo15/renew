@@ -20,8 +20,8 @@ env:
     - DOCKER_HUB_ACCOUNT=place_your_account_name_here
     - MAIN_BRANCHES="master develop staging" # Branches on which you want version to be incremented<%= if @docker do %>
     - RELEASE_BRANCH="master"<% end %><%= if @docker do %>
-    # Docker credentials
-    - secure: "..."
+    # Docker and GitHub credentials
+    # - secure: "..."
 branches:
   # Releases are generated automatically, stop infinite build loop
   except:
@@ -34,45 +34,47 @@ before_install:<%= if @ecto do %>
 script:<%= if @docker do %>
   # Increment version in mix.exs
   # Uncomment this if you want to increment patch version on each Travis build.
-  # - "./bin/version-increment.sh"<% end %>
+  # - ./bin/ci/version-increment.sh<% end %>
   # Install dependencies
-  - "mix deps.get"
+  - mix deps.get
   # Run all tests except pending ones
-  - "mix test --exclude pending --trace"
+  - mix test --exclude pending --trace
   # Submit code coverage report to Coveralls
   # Add --pro if you using private repo.
-  - "mix coveralls.travis"
+  - mix coveralls.travis --exclude pending
   # Run static code analysis
-  - "mix credo"
+  - mix credo --strict
   # Check code style
-  - "mix dogma"<%= if @docker do %>
+  - mix dogma<%= if @docker do %>
   # Build Docker container
-  - "./bin/build.sh"
+  - ./bin/build.sh
   # Initialize DB for Docker container
-  - "MIX_ENV=dev mix ecto.setup"
+  - MIX_ENV=dev mix ecto.setup
   # Run Docker container
   - sudo ./bin/start.sh
   - sleep 5
   - docker ps
   - RUNNING_CONTAINERS=`docker ps | wc -l`;
-  - if [ "${RUNNING_CONTAINERS//[[:space:]]/}" == "1" ]; then echo "[E] Container is not started!"; exit 1; fi;
+    if [ "${RUNNING_CONTAINERS//[[:space:]]/}" == "1" ]; then
+      echo "[E] Container is not started\!";
+      docker logs <%= @application_name %> --details --since 5h;
+      exit 1;
+    fi;
   # Run acceptance tests on Docker container
   - "CONTAINER_HTTP_HOST=localhost CONTAINER_HTTP_PORT=4000 mix test test/acceptance"
 after_failure:
-  - docker logs <%= @application_name %> --details --since 5h<% end %>
-# after_success:<%= if @docker do %>
-
+  - docker logs <%= @application_name %> --details --since 5h<% end %><%= if @docker do %>
 # Also you can
 # - automatically build images and push them to Docker Hub;
 # - create new git tag with build version and GitHub release on it.
 #
-# To do so you need to encrypt your docker user name and password and add to environment variables:
+# 1, Encrypt your docker user name and password and add to environment variables:
 #
 #   $ travis encrypt DOCKER_USERNAME=sample_username DOCKER_PASSWORD=strong_password
 #
 # More info: https://docs.travis-ci.com/user/encryption-keys/
 #
-# Additionally should add env "DOCKER_HUB_ACCOUNT=org_name" to set Hub's organization or account that will hold images.
+# 2. Add env "DOCKER_HUB_ACCOUNT=org_name" to set Hub's organization or account that will hold images.
 # Sample:
 #
 #   env:
@@ -80,8 +82,13 @@ after_failure:
 #       - DOCKER_HUB_ACCOUNT=org_name # Docker Hub Account or Organization that will hold images
 #       - secure: "encrypeted_credentials" # Encrypted credentials to login into Docker Hub
 #
-# Then uncomment following lines:
+# 3. Uncomment following lines:
 #
 # after_success:
 #   # Submit Docker container to Docker Hub and create GitHub Release by pushing tag with changelog
-#   - ./bin/ci/push.sh<% end %>
+#   - ./bin/ci/push.sh
+#
+# 4. If you are using public Travis-CI version it doesn't support deploy keys, so you will need to add a user-token to
+# push script manually.
+# 5. If you use Heroku Container Engine, you can auto-deploy changes:
+#   - ./bin/ci/deploy.sh<% end %>
