@@ -5,6 +5,7 @@ defmodule Renew.Generators.Ecto do
     {:cp, "ecto/lib/repo.ex",                   "lib/<%= @application_name %>/repo.ex"},
     {:cp, "ecto/priv/repo/seeds.exs",           "priv/repo/seeds.exs"},
     {:mkdir, "ecto/priv/repo/migrations/",      "priv/repo/migrations/"},
+    {:cp, "ecto/priv/repo/migrations/.gitkeep", "priv/repo/migrations/.gitkeep"},
     {:mkdir, "ecto/test/unit/models/",          "test/unit/models/"},
     {:cp, "ecto/test/support/model_case.ex",    "test/support/model_case.ex"},
     {:append, "ecto/.env",                      ".env"},
