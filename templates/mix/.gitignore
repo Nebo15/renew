@@ -36,8 +36,6 @@ GitHub.sublime-settings
 .DS_Store
 
 # Ignore released binaries
-rel/*/
-!rel/config.exs
 .deliver
 
 # Don't commit file uploads
