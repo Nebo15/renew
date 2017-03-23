@@ -88,29 +88,30 @@ defmodule Renew.Generators.Ecto do
 
     # Configure your database
     config :#{application_name}, #{module_name}.Repo,
-      adapter: #{adapter_name},
-      database: "#{application_name}_dev",
-      username: "#{db_user}",
-      password: "#{db_password}",
-      hostname: "localhost"
+      adapter: {:system, :module, "DB_ADAPTER", #{adapter_name}},
+      database: {:system, "DB_NAME", "#{application_name}_dev"},
+      username: {:system, "DB_USER", "#{db_user}"},
+      password: {:system, "DB_PASSWORD", "#{db_password}"},
+      hostname: {:system, "DB_HOST", "localhost"},
+      port: {:system, :integer, "DB_PORT", 5432}
     """
 
     test = """
     # Configure your database
     config :#{application_name}, #{module_name}.Repo,
       pool: Ecto.Adapters.SQL.Sandbox,
-      database: "#{application_name}_test"
+      database: {:system, "DB_NAME", "#{application_name}_test"}
     """
 
     prod = """
     # Configure your database
     config :#{application_name}, #{module_name}.Repo,
-      adapter: #{adapter_name},
-      database: "${DB_NAME}",
-      username: "${DB_USER}",
-      password: "${DB_PASSWORD}",
-      hostname: "${DB_HOST}",
-      port: "${DB_PORT}"
+      adapter: {:system, :module, "DB_ADAPTER", #{adapter_name}},
+      database: {:system, "DB_NAME"},
+      username: {:system, "DB_USER"},
+      password: {:system, "DB_PASSWORD"},
+      hostname: {:system, "DB_HOST"},
+      port: {:system, :integer, "DB_PORT"}
     """
 
     {main, test, "", prod}
