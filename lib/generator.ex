@@ -237,7 +237,7 @@ defmodule Renew.Generator do
   defp get_joining_splitter(acc) do
     case rem(IO.iodata_length(acc), 50) > 40 do
       true ->
-        ",\n                    "
+        ",\n                          "
 
       _ ->
         ", "
