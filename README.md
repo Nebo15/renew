@@ -111,7 +111,7 @@ Whenever you make a release for your app you can't use mix anymore, but you stil
 
 Your migrations will be preserved within container in `./priv/repo` folder.
 
-To run a migration set `APP_RUN_SEED=true` and `APP_MIGRATE=true` in your environment.
+To run a migration set `DB_MIGRATE=true` in your environment.
 
 ## Useful links
 

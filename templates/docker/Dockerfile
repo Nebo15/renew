@@ -60,5 +60,5 @@ WORKDIR /opt
 RUN $APP_NAME/hooks/pre-run.sh
 
 # The command to run when this image starts up.<%= if @ecto do %>
-# To run migrations on start set APP_MIGRATE=true env when starting container.<% end %>
+# To run migrations on start set DB_MIGRATE=true env when starting container.<% end %>
 CMD $APP_NAME/bin/$APP_NAME <%= if @sup do %>foreground<% else %>console<% end %>

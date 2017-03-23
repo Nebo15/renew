@@ -88,7 +88,7 @@ defmodule Renew.Generators.Ecto do
 
     # Configure your database
     config :#{application_name}, #{module_name}.Repo,
-      adapter: {:system, :module, "DB_ADAPTER", #{adapter_name}},
+      adapter: #{adapter_name},
       database: {:system, "DB_NAME", "#{application_name}_dev"},
       username: {:system, "DB_USER", "#{db_user}"},
       password: {:system, "DB_PASSWORD", "#{db_password}"},
@@ -106,7 +106,7 @@ defmodule Renew.Generators.Ecto do
     prod = """
     # Configure your database
     config :#{application_name}, #{module_name}.Repo,
-      adapter: {:system, :module, "DB_ADAPTER", #{adapter_name}},
+      adapter: #{adapter_name},
       database: {:system, "DB_NAME"},
       username: {:system, "DB_USER"},
       password: {:system, "DB_PASSWORD"},
