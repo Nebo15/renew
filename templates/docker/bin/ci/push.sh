@@ -16,14 +16,16 @@ git config --global push.default upstream;
 # git remote add upstream $REPO_URL &> /dev/null
 
 if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+  # Commit incremented version
+  git add mix.exs;
+  git commit -m "Increment version [ci skip]";
+
   if [ "$TRAVIS_BRANCH" == "$RELEASE_BRANCH" ]; then
     ./bin/ci/release.sh -a $DOCKER_HUB_ACCOUNT -t $TRAVIS_BRANCH -l;
   fi;
 
   if [[ "$MAIN_BRANCHES" =~ "$TRAVIS_BRANCH" ]]; then
-    echo "Done. Commiting changes back to repo.";
-    git add mix.exs;
-    git commit -m "Increment version [ci skip]";
+    echo "Done. Pushing changes back to repo.";
     git push origin HEAD:$TRAVIS_BRANCH;
     git push origin HEAD:$TRAVIS_BRANCH --tags;
   fi;
