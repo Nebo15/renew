@@ -60,10 +60,10 @@ fi
 
 # Get release notes
 PREVIOUS_TAG=$(git describe HEAD^1 --abbrev=0 --tags)
-GIT_HISTORY=$(git log --no-merges --format="- %s" $PREVIOUS_TAG..HEAD)
+GIT_HISTORY=$(git log --no-merges --format="- %s (%an)" $PREVIOUS_TAG..HEAD | grep --invert-match "ci skip" | grep --invert-match "changelog skip")
 
 if [[ $PREVIOUS_TAG == "" ]]; then
-  GIT_HISTORY=$(git log --no-merges --format="- %s")
+  GIT_HISTORY=$(git log --no-merges --format="- %s (%an)" | grep --invert-match "ci skip" | grep --invert-match "changelog skip")
 fi;
 
 # Create git tag that matches release version
