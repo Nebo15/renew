@@ -2,16 +2,15 @@
 # is restricted to this project.
 
 # General application configuration
-<%= if @has_custom_module_name? || @ecto do %>
-config :<%= @application_name %><%= if @has_custom_module_name? do %>,
-  namespace: <%= @module_name %><% end %><%= if @ecto do %>,
-  ecto_repos: [<%= @module_name %>.Repo]<% end %>
+<%= if @has_custom_module_name? do %>
+config :<%= @application_name %>,
+  namespace: <%= @module_name %>.Web
 
 <% end %># Configures the endpoint
-config :<%= @application_name %>, <%= @module_name %>.Endpoint,
+config :<%= @application_name %>, <%= @module_name %>.Web.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "<%= @secret_key_base %>",
-  render_errors: [view: <%= @module_name %>.ErrorView, accepts: ~w(json)]
+  render_errors: [view: EView.Views.PhoenixError, accepts: ~w(json)]
 
 # Configures Elixir's Logger
 config :logger, :console,

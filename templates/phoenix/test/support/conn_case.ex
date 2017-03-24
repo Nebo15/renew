@@ -12,21 +12,19 @@ defmodule <%= @module_name %>.ConnCase do
   inside a transaction which is reset at the beginning
   of the test unless the test case is marked as async.
   """
-
   use ExUnit.CaseTemplate
 
   using do
     quote do
       # Import conveniences for testing with connections
       use Phoenix.ConnTest<%= if @ecto do %>
-      alias <%= @module_name %>.Repo
       import Ecto
       import Ecto.Changeset
-      import Ecto.Query<% end %>
-      import <%= @module_name %>.Router.Helpers
+      import Ecto.Query
+      alias <%= @module_name %>.Repo<% end %>
 
       # The default endpoint for testing
-      @endpoint <%= @module_name %>.Endpoint
+      @endpoint <%= @module_name %>.Web.Endpoint
     end
   end
 
@@ -37,6 +35,11 @@ defmodule <%= @module_name %>.ConnCase do
       Ecto.Adapters.SQL.Sandbox.mode(<%= @module_name %>.Repo, {:shared, self()})
     end<% else %>
     _ = tags<% end %>
-    {:ok, conn: Phoenix.ConnTest.build_conn()}
+
+    conn =
+      Phoenix.ConnTest.build_conn()
+      |> Plug.Conn.put_req_header("content-type", "application/json")
+
+    {:ok, conn: conn}
   end
 end

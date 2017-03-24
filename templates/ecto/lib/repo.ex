@@ -12,23 +12,23 @@ defmodule <%= @module_name %>.Repo do
   def init(_, config) do
     config = Confex.process_env(config)
 
-    unless config[:secret_key_base] do
+    unless config[:database] do
       raise "Set DB_NAME environment variable!"
     end
 
-    unless config[:secret_key_base] do
+    unless config[:username] do
       raise "Set DB_USER environment variable!"
     end
 
-    unless config[:secret_key_base] do
+    unless config[:password] do
       raise "Set DB_PASSWORD environment variable!"
     end
 
-    unless config[:secret_key_base] do
+    unless config[:hostname] do
       raise "Set DB_HOST environment variable!"
     end
 
-    unless config[:secret_key_base] do
+    unless config[:port] do
       raise "Set DB_PORT environment variable!"
     end
 

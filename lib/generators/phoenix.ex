@@ -4,18 +4,17 @@ defmodule Renew.Generators.Phoenix do
   load_templates :tpl, [
     {:append, "phoenix/README.md",                     "README.md"},
     {:append, "phoenix/.env",                          ".env"},
-    {:cp, "phoenix/lib/endpoint.ex",                   "lib/<%= @application_name %>/endpoint.ex"},
 
-    {:cp, "phoenix/test/support/conn_case.ex",         "test/support/conn_case.ex"},
-    {:cp, "phoenix/test/support/acceptance_case.ex",   "test/support/acceptance_case.ex"},
-    {:cp, "phoenix/web/gates/initial_gate.ex",         "web/gates/initial_gate.ex"},
-    {:cp, "phoenix/web/router.ex",                     "web/router.ex"},
-    {:cp, "phoenix/web/web.ex",                        "web/web.ex"},
-    {:cp, "phoenix/web/views/error_view.ex",           "web/views/error_view.ex"},
-    {:cp, "phoenix/web/views/page_view.ex",            "web/views/page_view.ex"},
-    {:cp, "phoenix/web/controllers/page_controller.ex",             "web/controllers/page_controller.ex"},
-    {:cp, "phoenix/test/acceptance/initial_gate/page_test.exs",     "test/acceptance/intial_gate/page_test.exs"},
-    {:cp, "phoenix/test/unit/controllers/page_controller_test.exs", "test/unit/controllers/page_controller_test.exs"},
+    {:cp, "phoenix/lib/web/endpoint.ex",               "lib/<%= @application_name %>/web/endpoint.ex"},
+    {:cp, "phoenix/lib/web/gates/initial.ex",          "lib/<%= @application_name %>/web/gates/initial.ex"},
+    {:cp, "phoenix/lib/web/router.ex",                 "lib/<%= @application_name %>/web/router.ex"},
+    {:cp, "phoenix/lib/web/web.ex",                    "lib/<%= @application_name %>/web/web.ex"},
+    {:cp, "phoenix/lib/web/views/page.ex",             "lib/<%= @application_name %>/web/views/page.ex"},
+    {:cp, "phoenix/lib/web/controllers/page.ex",       "lib/<%= @application_name %>/web/controllers/page.ex"},
+
+    {:cp, "phoenix/test/support/conn_case.ex",                      "test/support/conn_case.ex"},
+    {:cp, "phoenix/test/acceptance/web/initial_gate/page_test.exs", "test/acceptance/web/intial_gate/page_test.exs"},
+    {:cp, "phoenix/test/unit/web/controllers/page_test.exs",        "test/unit/web/controllers/page_test.exs"},
   ]
 
   load_template :config_main, 'phoenix/config/config.exs'
@@ -28,17 +27,16 @@ defmodule Renew.Generators.Phoenix do
   ]
 
   @deps [
-    ~S({:cowboy, "~> 1.0"}),
-    ~S({:httpoison, "~> 0.9.2"}),
-    ~S({:poison, "~> 2.0"}),
-    ~S({:phoenix, "~> 1.2.0"}),
-    ~S({:timex, "~> 3.0"}),
-    ~S({:multiverse, "~> 0.4.1"}),
-    ~S({:eview, "~> 0.2.5"}),
+    ~S({:cowboy, "~> 1.1"}),
+    ~S({:httpoison, "~> 0.11.1"}),
+    ~S({:poison, "~> 3.1"}),
+    ~S({:phoenix, "~> 1.3.0-rc"}),
+    ~S({:multiverse, "~> 0.4.3"}),
+    ~S({:eview, "~> 0.10.0"}),
   ]
 
   @deps_ecto [
-    ~S({:phoenix_ecto, "~> 3.1.0-rc.0"}),
+    ~S({:phoenix_ecto, "~> 3.2"}),
   ]
 
   @apps [
@@ -46,7 +44,6 @@ defmodule Renew.Generators.Phoenix do
     ~S(:httpoison),
     ~S(:poison),
     ~S(:phoenix),
-    ~S(:timex),
     ~S(:multiverse),
     ~S(:eview),
   ]

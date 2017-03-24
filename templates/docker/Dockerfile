@@ -40,9 +40,6 @@ RUN \
     chmod -R 777 /opt/$APP_NAME && \
     chmod -R 777 /var/log
 
-# If you want to start distributed nodes uncomment this line
-# RUN epmd -daemon
-
 # Change user to "default"
 USER default
 

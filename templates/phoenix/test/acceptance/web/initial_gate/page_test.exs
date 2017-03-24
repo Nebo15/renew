@@ -1,5 +1,10 @@
-defmodule <%= @module_name %>.PageAcceptanceTest do
-  use <%= @module_name %>.AcceptanceCase, async: true
+defmodule <%= @module_name %>.Web.Controllers.PageAcceptanceTest do
+  use EView.AcceptanceCase,
+    async: true,
+    otp_app: :<%= @application_name %>,
+    endpoint: <%= @module_name %>.Web.Endpoint,
+    <%= if @ecto do %>repo: <%= @module_name %>.Repo,<% end %>
+    headers: [{"content-type", "application/json"}]
 
   test "GET /page" do
     %{body: body} = get!("page")
@@ -18,6 +23,6 @@ defmodule <%= @module_name %>.PageAcceptanceTest do
         },
         "type" => "page"
       }
-    } = body |> Poison.decode!
+    } = body
   end
 end

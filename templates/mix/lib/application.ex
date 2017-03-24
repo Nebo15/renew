@@ -15,7 +15,7 @@ defmodule <%= @module_name %> do
       # Start the Ecto repository
       supervisor(<%= @module_name %>.Repo, []),<% end %><%= if @phoenix do %>
       # Start the endpoint when the application starts
-      supervisor(<%= @module_name %>.Endpoint, []),<% end %><%= if @amqp do %>
+      supervisor(<%= @module_name %>.Web.Endpoint, []),<% end %><%= if @amqp do %>
       # Start RabbitMQ supervisor and consumer
       supervisor(<%= @module_name %>.AMQP.Connection, []),
       supervisor(<%= @module_name %>.AMQP.Producer, []),
@@ -33,7 +33,7 @@ defmodule <%= @module_name %> do
   # Tell Phoenix to update the endpoint configuration
   # whenever the application is updated.
   def config_change(changed, _new, removed) do
-    <%= @module_name %>.Endpoint.config_change(changed, removed)
+    <%= @module_name %>.Web.Endpoint.config_change(changed, removed)
     :ok
   end<% end %><% end %>
 end

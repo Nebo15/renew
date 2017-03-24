@@ -4,13 +4,12 @@
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we use it
 # with brunch.io to recompile .js and .css sources.
-config :<%= @application_name %>, <%= @module_name %>.Endpoint,
+config :<%= @application_name %>, <%= @module_name %>.Web.Endpoint,
   http: [port: 4000],
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
   watchers: []
-
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"
