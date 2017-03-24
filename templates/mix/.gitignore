@@ -41,3 +41,9 @@ GitHub.sublime-settings
 # Don't commit file uploads
 uploads/
 !uploads/.gitkeep
+
+# Don't ever commit this files to docker
+*.p12
+*id_rsa*
+*.key
+*.csr
