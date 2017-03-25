@@ -232,15 +232,34 @@ defmodule Mix.Tasks.Renew do
 
   defp in_umbrella?(app_path) do
     try do
-      umbrella = Path.expand(Path.join [app_path, "..", ".."]) # TODO debug
-      File.exists?(Path.join(umbrella, "mix.exs")) &&
-        Mix.Project.in_project(:umbrella_check, umbrella, fn _ ->
-          path = Mix.Project.config[:apps_path]
-          path && Path.expand(path) == Path.join(umbrella, "apps")
-        end)
+      umbrella = Path.expand(Path.join [app_path, "..", ".."])
+      mix_path = Path.join(umbrella, "mix.exs")
+      apps_path = Path.join(umbrella, "apps")
+      File.exists?(mix_path) && File.exists?(apps_path)
     catch
       _, _ -> false
     end
+  end
+
+  def web_prefix do
+    app = to_string(otp_app())
+    if in_umbrella?(File.cwd!()) do
+      Path.join("lib", app)
+    else
+      Path.join(["lib", app, "web"])
+    end
+  end
+
+  def test_prefix do
+    if in_umbrella?(File.cwd!()) do
+      "test"
+    else
+      "test/web"
+    end
+  end
+
+  def otp_app do
+    Mix.Project.config |> Keyword.fetch!(:app)
   end
 
   defp get_begin_message(%{umbrella: true} = opts) do
