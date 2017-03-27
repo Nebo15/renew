@@ -32,7 +32,7 @@ defmodule Renew.Generators.Phoenix do
     ~S({:poison, "~> 3.1"}),
     ~S({:phoenix, "~> 1.3.0-rc"}),
     ~S({:multiverse, "~> 0.4.3"}),
-    ~S({:eview, "~> 0.10.0"}),
+    ~S({:eview, "~> 0.10.1"}),
   ]
 
   @deps_ecto [
