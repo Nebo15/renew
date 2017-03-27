@@ -1,4 +1,4 @@
-defmodule <%= @module_name %>.Web.Controllers.Fallback do
+defmodule <%= @module_name %>.Web.FallbackController do
   @moduledoc """
   This controller should be used as `action_fallback` in rest of controllers to remove duplicated error handling.
   """

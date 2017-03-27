@@ -14,16 +14,16 @@ defmodule <%= @module_name %>.Web.Router do
 
     # Uncomment to enable versioning of your API
     # plug Multiverse, gates: [
-    #   "2016-07-31": <%= @module_name %>.Web.Gates.Gate
+    #   "2016-07-31": <%= @module_name %>.Web.InitialGate
     # ]
 
     # You can allow JSONP requests by uncommenting this line:
     # plug :allow_jsonp
   end
 
-  scope "/", <%= @module_name %>.Web.Controllers do
+  scope "/", <%= @module_name %>.Web do
     pipe_through :api
 
-    get "/page", Page, :index
+    get "/page", PageController, :index
   end
 end

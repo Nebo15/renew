@@ -1,4 +1,4 @@
-defmodule <%= @module_name %>.Web.Controllers.PageTest do
+defmodule <%= @module_name %>.Web.PageControllerTest do
   @moduledoc false
   use <%= @module_name %>.ConnCase
 

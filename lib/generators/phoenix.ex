@@ -5,16 +5,16 @@ defmodule Renew.Generators.Phoenix do
     {:append, "phoenix/README.md",                     "README.md"},
     {:append, "phoenix/.env",                          ".env"},
 
-    {:cp, "phoenix/lib/web/endpoint.ex",               "lib/<%= @application_name %>/web/endpoint.ex"},
-    {:cp, "phoenix/lib/web/gates/initial.ex",          "lib/<%= @application_name %>/web/gates/initial.ex"},
-    {:cp, "phoenix/lib/web/router.ex",                 "lib/<%= @application_name %>/web/router.ex"},
-    {:cp, "phoenix/lib/web/web.ex",                    "lib/<%= @application_name %>/web/web.ex"},
-    {:cp, "phoenix/lib/web/views/page.ex",             "lib/<%= @application_name %>/web/views/page.ex"},
-    {:cp, "phoenix/lib/web/controllers/page.ex",       "lib/<%= @application_name %>/web/controllers/page.ex"},
+    {:cp, "phoenix/lib/web/endpoint.ex",                    "lib/<%= @application_name %>/web/endpoint.ex"},
+    {:cp, "phoenix/lib/web/gates/initial_gate.ex",          "lib/<%= @application_name %>/web/gates/initial_gate.ex"},
+    {:cp, "phoenix/lib/web/router.ex",                      "lib/<%= @application_name %>/web/router.ex"},
+    {:cp, "phoenix/lib/web/web.ex",                         "lib/<%= @application_name %>/web/web.ex"},
+    {:cp, "phoenix/lib/web/views/page_view.ex",             "lib/<%= @application_name %>/web/views/page_view.ex"},
+    {:cp, "phoenix/lib/web/controllers/page_controller.ex", "lib/<%= @application_name %>/web/controllers/page_controller.ex"},
 
-    {:cp, "phoenix/test/support/conn_case.ex",                      "test/support/conn_case.ex"},
-    {:cp, "phoenix/test/acceptance/web/initial_gate/page_test.exs", "test/acceptance/web/intial_gate/page_test.exs"},
-    {:cp, "phoenix/test/unit/web/controllers/page_test.exs",        "test/unit/web/controllers/page_test.exs"},
+    {:cp, "phoenix/test/support/conn_case.ex",                                 "test/support/conn_case.ex"},
+    {:cp, "phoenix/test/acceptance/web/initial_gate/page_controller_test.exs", "test/acceptance/web/intial_gate/page_controller_test.exs"},
+    {:cp, "phoenix/test/unit/web/controllers/page_controller_test.exs",        "test/unit/web/controllers/page_controller_test.exs"},
   ]
 
   load_template :config_main, 'phoenix/config/config.exs'

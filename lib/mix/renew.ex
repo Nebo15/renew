@@ -232,10 +232,12 @@ defmodule Mix.Tasks.Renew do
 
   defp in_umbrella?(app_path) do
     try do
-      umbrella = Path.expand(Path.join [app_path, "..", ".."])
-      mix_path = Path.join(umbrella, "mix.exs")
-      apps_path = Path.join(umbrella, "apps")
-      File.exists?(mix_path) && File.exists?(apps_path)
+      umbrella = Path.expand(Path.join [app_path, "..", ".."]) # TODO debug
+      File.exists?(Path.join(umbrella, "mix.exs")) &&
+        Mix.Project.in_project(:umbrella_check, umbrella, fn _ ->
+          path = Mix.Project.config[:apps_path]
+          path && Path.expand(path) == Path.join(umbrella, "apps")
+        end)
     catch
       _, _ -> false
     end
