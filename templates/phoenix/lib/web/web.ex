@@ -26,6 +26,7 @@ defmodule <%= @module_name %>.Web do
   def view do
     quote do
       # Import convenience functions from controllers
+      import Phoenix.View
       import Phoenix.Controller, only: [view_module: 1]
     end
   end
