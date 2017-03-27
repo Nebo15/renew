@@ -2,9 +2,9 @@ defmodule <%= @module_name %>.Web.FallbackController do
   @moduledoc """
   This controller should be used as `action_fallback` in rest of controllers to remove duplicated error handling.
   """
-  use PRM.Web, :controller
+  use <%= @module_name %>.Web, :controller
 
-  defp call(conn, {:error, :access_denied}) do
+  def call(conn, {:error, :access_denied}) do
     conn
     |> put_status(:unauthorized)
     |> render(EView.Views.Error, :"401")
