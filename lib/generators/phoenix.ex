@@ -16,7 +16,7 @@ defmodule Renew.Generators.Phoenix do
 
     {:cp, "phoenix/test/support/conn_case.ex",                                 "test/support/conn_case.ex"},
     {:cp, "phoenix/test/acceptance/web/initial_gate/page_controller_test.exs", "test/acceptance/web/intial_gate/page_controller_test.exs"},
-    {:cp, "phoenix/test/unit/web/page_controller_test.exs",                    "test/unit/web/page_controller_test.exs"},
+    {:cp, "phoenix/test/unit/web/controllers/page_controller_test.exs",        "test/unit/web/controllers/page_controller_test.exs"},
   ]
 
   load_template :config_main, 'phoenix/config/config.exs'

@@ -1,4 +1,4 @@
-defmodule <%= @module_name %>.ModelCase do
+defmodule <%= @module_name %>.DataCase do
   @moduledoc """
   This module defines the setup for tests requiring
   access to the application's data layer.
@@ -21,7 +21,7 @@ defmodule <%= @module_name %>.ModelCase do
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
-      import <%= @module_name %>.ModelCase
+      import <%= @module_name %>.DataCase
     end
   end
 

@@ -1,6 +1,6 @@
 defmodule <%= @module_name %>.Web.PageControllerTest do
   @moduledoc false
-  use <%= @module_name %>.ConnCase
+  use <%= @module_name %>.Web.ConnCase
 
   test "GET /page", %{conn: conn} do
     conn = get conn, "/page"

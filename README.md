@@ -39,7 +39,7 @@ So it includes:
 Install this package globally:
 
   ```
-  mix archive.install https://github.com/Nebo15/renew/releases/download/0.15.0/renew.ez
+  mix archive.install https://github.com/Nebo15/renew/releases/download/0.16.0/renew.ez
   ```
 
 ## Usage

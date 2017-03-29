@@ -1,4 +1,4 @@
-defmodule <%= @module_name %>.ConnCase do
+defmodule <%= @module_name %>.Web.ConnCase do
   @moduledoc """
   This module defines the test case to be used by
   tests that require setting up a connection.
@@ -18,6 +18,7 @@ defmodule <%= @module_name %>.ConnCase do
     quote do
       # Import conveniences for testing with connections
       use Phoenix.ConnTest<%= if @ecto do %>
+      import <%= @module_name %>.Web.Router.Helpers
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
