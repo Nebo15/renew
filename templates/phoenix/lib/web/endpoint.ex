@@ -33,7 +33,7 @@ defmodule <%= @module_name %>.Web.Endpoint do
   and must return the updated configuration.
   """
   def load_from_system_env(config) do
-    config = Confex.process_env(config )
+    config = Confex.process_env(config)
 
     unless config[:secret_key_base] do
       raise "Set SECRET_KEY environment variable!"
