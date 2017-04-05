@@ -20,6 +20,7 @@ defmodule <%= @module_name %>.Web do
     quote do
       use Phoenix.Controller<%= if @has_custom_module_name? do %>, namespace: <%= @module_name %>.Web<% end %>
       import Plug.Conn
+      import <%= @module_name %>.Web.Router.Helpers
     end
   end
 
@@ -28,6 +29,12 @@ defmodule <%= @module_name %>.Web do
       # Import convenience functions from controllers
       import Phoenix.View
       import Phoenix.Controller, only: [view_module: 1]
+      import <%= @module_name %>.Web.Router.Helpers
+
+      @view_resource String.to_atom(Phoenix.Naming.resource_name(__MODULE__, "View"))
+
+      @doc "The resource name, as an atom, for this view"
+      def __resource__, do: @view_resource
     end
   end
 
