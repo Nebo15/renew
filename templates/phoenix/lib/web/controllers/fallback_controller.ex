@@ -19,7 +19,7 @@ defmodule <%= @module_name %>.Web.FallbackController do
   def call(conn, nil) do
     conn
     |> put_status(:not_found)
-    |> render(EView.Views.Error, :"404")
+    |> render(EView.Views.Error, :"404")<%= if @ecto do %>
   end
 
   def call(conn, {:error, %Ecto.Changeset{} = changeset}) do
@@ -32,5 +32,5 @@ defmodule <%= @module_name %>.Web.FallbackController do
     conn
     |> put_status(:unprocessable_entity)
     |> render(EView.Views.ValidationError, :"422", changeset)
-  end
+  end<% end %>
 end

@@ -4,7 +4,7 @@
 # General application configuration
 <%= if @has_custom_module_name? do %>
 config :<%= @application_name %>,
-  namespace: <%= @module_name %>.Web
+  namespace: <%= @module_name %>
 
 <% end %># Configures the endpoint
 config :<%= @application_name %>, <%= @module_name %>.Web.Endpoint,
