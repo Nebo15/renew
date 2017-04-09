@@ -22,9 +22,6 @@ config :<%= @application_name %>, <%= @module_name %>.Web.Endpoint,
   debug_errors: false,
   code_reloader: false
 
-# Do not print debug messages in production
-config :logger, level: :info
-
 # Do not log passwords, card data and tokens
 config :phoenix, :filter_parameters, ["password", "secret", "token", "password_confirmation", "card", "pan", "cvv"]
 

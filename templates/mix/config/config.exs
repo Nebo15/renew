@@ -25,6 +25,12 @@ use Mix.Config
 #     :var_name, "${ENV_VAR_NAME}"
 <%= @config %>
 
+# Configure JSON Logger back-end
+config :logger_json, :backend,
+  on_init: {<%= @module_name %>, :load_from_system_env, []},
+  json_encoder: Poison,
+  metadata: :all
+
 # It is also possible to import configuration files, relative to this
 # directory. For example, you can emulate configuration per environment
 # by uncommenting the line below and defining dev.exs, test.exs and such.

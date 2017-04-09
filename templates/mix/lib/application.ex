@@ -36,4 +36,10 @@ defmodule <%= @module_name %> do
     <%= @module_name %>.Web.Endpoint.config_change(changed, removed)
     :ok
   end<% end %><% end %>
+
+  # Loads configuration in `:on_init` callbacks and replaces `{:system, ..}` tuples via Confex
+  @doc false
+  def load_from_system_env(config) do
+    {:ok, Confex.process_env(config)}
+  end
 end

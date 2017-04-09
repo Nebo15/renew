@@ -22,11 +22,15 @@ defmodule Renew.Generators.Mix do
 
   @deps [
     ~S({:confex, "~> 1.4"}),
+    ~S({:logger_json, "~> 0.3.0"}),
+    ~S({:poison, "~> 3.1"}),
   ]
 
   @apps [
     ~S(:confex),
     ~S(:runtime_tools),
+    ~S(:logger_json),
+    ~S(:poison),
   ]
 
   load_templates :tpl_release, [

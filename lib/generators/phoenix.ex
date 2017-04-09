@@ -31,7 +31,6 @@ defmodule Renew.Generators.Phoenix do
   @deps [
     ~S({:cowboy, "~> 1.1"}),
     ~S({:httpoison, "~> 0.11.1"}),
-    ~S({:poison, "~> 3.1"}),
     ~S({:phoenix, "~> 1.3.0-rc"}),
     ~S({:multiverse, "~> 0.4.3"}),
     ~S({:eview, "~> 0.10.1"}),
@@ -44,7 +43,6 @@ defmodule Renew.Generators.Phoenix do
   @apps [
     ~S(:cowboy),
     ~S(:httpoison),
-    ~S(:poison),
     ~S(:phoenix),
     ~S(:multiverse),
     ~S(:eview),

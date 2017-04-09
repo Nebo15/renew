@@ -22,6 +22,7 @@ So it includes:
   - [Multiverse](http://github.com/Nebo15/multiverse/) response compatibility layers.
   - [RBMQ](https://github.com/Nebo15/rbmq) RabbitMQ wrapper.
   - [EView](https://github.com/Nebo15/eview) Phoenix response and views wrapper.
+  - [LoggerJSON](https://github.com/Nebo15/eview) - JSON console back-end for Elixir Logger.
   - Code Coverage, Analysis and Benchmarking tools:
 
     - [Benchfella](https://github.com/alco/benchfella) - Microbenchmarking tool.
@@ -39,7 +40,7 @@ So it includes:
 Install this package globally:
 
   ```
-  mix archive.install https://github.com/Nebo15/renew/releases/download/0.16.2/renew.ez
+  mix archive.install https://github.com/Nebo15/renew/releases/download/0.17.0/renew.ez
   ```
 
 ## Usage
