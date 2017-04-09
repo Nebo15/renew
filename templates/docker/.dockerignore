@@ -29,6 +29,9 @@ Dockerfile
 README.md
 LICENSE.md
 
+# Ignore docs
+*.apib
+
 # Ignore other CI configuration and scripts
 coveralls.json
 .env
