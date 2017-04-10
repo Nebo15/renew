@@ -4,6 +4,7 @@ defmodule <%= @module_name %> do
   """<%= if @sup do %>
 
   use Application
+  alias <%= @module_name %>.Web.Endpoint
 
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
   # for more information on OTP Applications
@@ -33,7 +34,7 @@ defmodule <%= @module_name %> do
   # Tell Phoenix to update the endpoint configuration
   # whenever the application is updated.
   def config_change(changed, _new, removed) do
-    <%= @module_name %>.Web.Endpoint.config_change(changed, removed)
+    Endpoint.config_change(changed, removed)
     :ok
   end<% end %><% end %>
 
