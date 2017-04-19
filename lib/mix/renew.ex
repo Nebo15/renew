@@ -36,6 +36,10 @@ defmodule Mix.Tasks.Renew do
   A `--ci` option can be given in order
   to add CI tools in the generated code skeleton.
 
+  A `--heroku` option will setup a Heroku auto-deploy and
+  easy install script (works only when both `--ci` and `--docker`
+  options are enabled).
+
   A `--ecto` option can be given in order
   to add Ecto in the generated code skeleton.
 
@@ -47,6 +51,9 @@ defmodule Mix.Tasks.Renew do
 
   A `--amqp` option can be given in order
   to add Rabbit MQ client (AMQP) in the generated code skeleton.
+
+  A `--docs` option will auto-generate API and deployment
+  documentation templates.
 
   ## Examples
 
@@ -72,7 +79,9 @@ defmodule Mix.Tasks.Renew do
     Renew.Generators.Phoenix,
     Renew.Generators.Docker,
     Renew.Generators.CI,
+    Renew.Generators.Heroku,
     Renew.Generators.AMQP,
+    Renew.Generators.Docs,
   ]
 
   @switches [
@@ -83,6 +92,8 @@ defmodule Mix.Tasks.Renew do
     ecto_db: :string,
     amqp: :boolean,
     phoenix: :boolean,
+    docs: :boolean,
+    heroku: :boolean,
     umbrella: :boolean,
     app: :string,
     module: :string,
@@ -99,6 +110,8 @@ defmodule Mix.Tasks.Renew do
       sup: opts[:phoenix] || opts[:sup] || false, # Phoenix requires supervisor
       ecto: opts[:ecto] || false,
       amqp: opts[:amqp] || false,
+      heroku: opts[:heroku] || false,
+      docs: opts[:docs] || true,
       ecto_db: opts[:ecto_db] || "postgres",
       phoenix: opts[:phoenix] || false,
       umbrella: opts[:umbrella] || false

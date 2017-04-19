@@ -1,0 +1,151 @@
+FORMAT: 1A
+HOST: https://<%= @application_name %>.herokuapp.com/
+
+# <%= @module_name %>
+
+**TODO: Service description**
+
+## Use Cases
+
+**TODO: Use Cases**
+
+## Setup Guide
+
+### Docker
+
+Easiest way to deploy <%= @module_name %> is to use docker containers.
+We constantly are releasing pre-built versions that will reduce time to deploy:
+
+- [Back-End Docker container]() (~100 MB).
+
+**TODO: Other Containers**
+
+They are built on top of Alpine Linux, to reduce container size and memory consumption.
+
+## Pages [/pages]
+
+### Search for a Page [GET /pages{?limit,starting_after,ending_before,labels,title}]
+
++ Parameters
+    + labels: `label-name1,label-name2` (string, optional) - Label names to filter Pages list.
+    + limit: 20 (number, optional) - A limit on the number of objects to be returned, between 1 and 100. Default: 50.
+    + starting_after: 56c31536a60ad644060041af (string, optional) - A cursor to fetch next page. Taken from collection response.
+    + ending_before: 56c31536a60ad644060041aa (string, optional) - A cursor to fetch previous page. Taken from collection response.
+    + title: Signup (string, optional) - Substring search for a title.
+
++ Response 200 (application/json)
+    + Attributes (Response_Collection)
+        + data (array[Page])
+
+### Create Page [POST]
+
++ Request (application/json)
+    + Attributes (Page)
+
++ Response 201 (application/json)
+    + Attributes (Response_OK)
+        + meta (Response__Meta)
+            + code: 201 (number)
+        + data (Page)
+
+### Get Page by ID [GET /pages/{id}]
+
++ Parameters
+    + id: 58e2278a84092e61700041a7 (string, optional) - Page ID
+
++ Response 200 (application/json)
+    + Attributes (Response_OK)
+        + data (Page)
+
+### Replace Page [PUT /pages/{id}]
+
++ Parameters
+    + id: 58e2278a84092e61700041a7 (string, optional) - Page ID
+
++ Request (application/json)
+    + Attributes (Page)
+
++ Response 200 (application/json)
+    + Attributes (Response_OK)
+        + data (Page)
+
+### Update Page [PATCH /pages/{id}]
+
++ Parameters
+    + id: 58e2278a84092e61700041a7 (string, optional) - Page ID
+
++ Request (application/json)
+    + Attributes (object)
+        + body: `<h1>{{user_name}}</h1>` (string, optional)
+
++ Response 200 (application/json)
+    + Attributes (Response_OK)
+        + data (Page)
+            + body: `<h1>{{user_name}}</h1>` (string, required)
+
+### Delete Page [DELETE /pages/{id}]
+
++ Parameters
+    + id: 58e2278a84092e61700041a7 (string, optional) - Page ID
+
++ Request (application/json)
++ Response 200 (application/json)
+
+# Data Structures
+## Responses
+### `Response_Collection`
++ meta (Response__Meta, fixed-type)
++ data (array[], fixed-type)
++ paging (Response__Pagination, fixed-type)
+
+### `Response_OK`
++ meta (Response__Meta, fixed-type)
++ data (object, fixed-type)
+
+### `Response_Error`
++ meta (Response__Meta, fixed-type)
+    + code: 400 (number)
++ error (Response__Error, fixed-type)
+
+### `Response__Meta`
++ code: 200 (number) - HTTP response code.
++ url: http://example.com/resource (string) - URL to requested resource.
++ type (enum) - Type of data that is located in `data` attribute.
+    - object (string) - `data` attribute is a JSON object.
+    - list (string) - `data` attribute is a list.
++ code: 200 (number) - HTTP response code.
++ `idempotency_key`: `idemp-ssjssdjoa8308u0us0` (string, optional) - [Idempotency key](http://docs.apimanifest.apiary.io/#introduction/optional-features/idempotent-requests). Send it trough `X-Idempotency-Key` header.
++ `request_id`: `req-adasdoijasdojsda` (string) - [Request ID](http://docs.apimanifest.apiary.io/#introduction/interacting-with-api/request-id). Send it with `X-Request-ID` header.
+
+### `Response__Error`
++ type: type_atom (string) - Atom that represents error type.
++ message: Error description (string) - Human-readable error message. This is for developers, not end-users.
+
+### `Response__Error_DuplicateEntity`
++ type: `object_already_exists` (string) - Atom that represents error type.
++ message: This API already exists (string) - Human-readable error message. This is for developers, not end-users.
+
+### `Response__Error_ValidationFailed`
++ type: validation_failed (string) - type of an error.
++ message: Validation failed. You can find validators description at our API Manifest: http://docs.apimanifest.apiary.io/#introduction/interacting-with-api/errors. (string)
++ invalid (array)
+    + `entry_type`: `json_data_proprty` (string) - Type of error.
+    + entry: $.cvv (string) - JSON Path to an invalid property.
+    + rules (array)
+        + rule: required (string) - String constant that represents validation rule type. List of all types can be found in [API Manifest](http://docs.apimanifest.apiary.io/#introduction/interacting-with-api/errors).
+        + params (array) - Validation Parameters.
+
+### `Response__Pagination`
++ limit: 20 (number) - A limit on the number of objects to be returned, between 1 and 100. Default: 50.
++ cursors (object)
+    + `starting_after`: 56c31536a60ad644060041af (string) - A cursor for use in pagination. An object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with `obj_foo`, your subsequent call can include `starting_after=obj_foo` in order to fetch the next page of the list.
+    + `ending_before`: 56c31536a60ad644060041aa (string) - A cursor for use in pagination. An object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, starting with `obj_bar`, your subsequent call can include `ending_before=obj_bar` in order to fetch the previous page of the list.
++ size: 1000 (number) - Total number of objects in collection.
++ has_more: false (boolean) - Is this collection have more data to load in the same style as last request loaded it.
+
+## Pages
+### Page
++ id: 58e2278a84092e61700041a7 (string, optional)
++ title: `Sign-Up Email` (string, required) - Page UI title with max length 255 characters.
++ description: `Email that is sent on signup process` (string, optional) - Page UI description with max length 510 characters.
++ body: `<h1>{{l10n.hello}} {{user_name}}, in {{locale}}</h1>` (string, required) - Page that should be rendered with `syntax` processor.

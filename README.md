@@ -34,6 +34,7 @@ So it includes:
   - Pre-Commit hooks to keep code clean.
   - Docker container configuration and helper scripts.
   - Heroku auto-deploy script for Travis-Ci.
+  - API Blueprint and DevOps docs templates.
 
 ## Installation
 
