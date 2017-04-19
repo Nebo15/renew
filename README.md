@@ -33,7 +33,7 @@ So it includes:
   - Setup for [Travis-CI](http://travis-ci.org/) Continuous Integration. And many scripts that makes simpler to work with it.
   - Pre-Commit hooks to keep code clean.
   - Docker container configuration and helper scripts.
-
+  - Heroku auto-deploy script for Travis-Ci.
 
 ## Installation
 
