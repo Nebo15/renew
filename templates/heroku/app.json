@@ -1,0 +1,47 @@
+{
+  "name": "Man",
+  "description": "Templates rendering as a service.",
+  "keywords": [
+    "reports",
+    "templates",
+    "email",
+    "sms",
+    "rendering"
+  ],
+  "website": "http://docs.man2.apiary.io/",
+  "repository": "https://github.com/nebo15/man.api",
+  "success_url": "/templates",
+  "env": {
+    "HOST": {
+      "description": "HTTP port for web app to listen on.",
+      "value": "localhost"
+    },
+    "DB_MIGRATE": {
+      "description": "Migrate database when container starts.",
+      "value": "true"
+    },
+    "SECRET_KEY": {
+      "description": "Phoenix [`:secret_key_base`](https://hexdocs.pm/phoenix/Phoenix.Endpoint.html).",
+      "generator": "secret"
+    },
+    "ERLANG_COOKIE": {
+      "description": "Erlang distribution cookie.",
+      "generator": "secret"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "Standard-1X"
+    }
+  },
+  "image": "nebo15/man",
+  "addons": [
+    {
+      "plan": "heroku-postgresql",
+      "options": {
+        "version": "9.5"
+      }
+    }
+  ]
+}

@@ -10,7 +10,6 @@ defmodule Renew.Generators.Docker do
     {:cp, "docker/bin/ci/release.sh",        "bin/ci/release.sh"},
     {:cp, "docker/bin/hooks/pre-run.sh",     "bin/hooks/pre-run.sh"},
     {:cp, "docker/bin/ci/push.sh",           "bin/ci/push.sh"},
-    {:cp, "docker/bin/ci/deploy.sh",         "bin/ci/deploy.sh"},
   ]
 
   def apply?(assigns) do
