@@ -6,6 +6,8 @@ defmodule <%= @module_name %>.ReleaseTasks do
 
       <%= @application_name %>/bin/<%= @application_name %> command Elixir.<%= @module_name %>.ReleaseTasks migrate!
   """
+  alias Ecto.Migrator
+
   @start_apps [
     :logger,
     :logger_json,
@@ -54,7 +56,7 @@ defmodule <%= @module_name %>.ReleaseTasks do
 
   defp run_migrations_for(app) do
     IO.puts "Running migrations for #{app}"
-    Enum.each(@repos, &Ecto.Migrator.run(&1, migrations_path(app), :up, all: true))
+    Enum.each(@repos, &Migrator.run(&1, migrations_path(app), :up, all: true))
   end
 
   defp migrations_path(app),
