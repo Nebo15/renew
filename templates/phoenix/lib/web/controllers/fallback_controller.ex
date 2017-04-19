@@ -26,11 +26,5 @@ defmodule <%= @module_name %>.Web.FallbackController do
     conn
     |> put_status(:unprocessable_entity)
     |> render(EView.Views.ValidationError, :"422", changeset)
-  end
-
-  def call(conn, %Ecto.Changeset{valid?: false} = changeset) do
-    conn
-    |> put_status(:unprocessable_entity)
-    |> render(EView.Views.ValidationError, :"422", changeset)
   end<% end %>
 end
