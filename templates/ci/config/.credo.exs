@@ -3,8 +3,7 @@
     %{
       name: "default",
       files: %{
-        included: ["lib/"],
-        excluded: ["lib/<%= @application_name %>/tasks.ex"]
+        included: ["lib/"]
       },
       checks: [
         {Credo.Check.Design.TagTODO, exit_status: 0},
