@@ -90,5 +90,6 @@ after_failure:
 #
 # 4. If you are using public Travis-CI version it doesn't support deploy keys, so you will need to add a user-token to
 # push script manually.
-# 5. If you use Heroku Container Engine, you can auto-deploy changes:
+# 5. If you use Heroku Container Engine, you can auto-deploy changes
+# (make sure HEROKU_API_TOKEN secret and HEROKU_APP_NAME env is set):
 #   - ./bin/ci/deploy.sh<% end %>
