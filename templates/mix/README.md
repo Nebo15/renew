@@ -1,7 +1,7 @@
 # <%= @module_name %>
 
 **TODO: Add description**
-<%= if @application_name do %>
+<%= if @application_name && !@phoenix do %>
 ## Installation
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
