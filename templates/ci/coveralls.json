@@ -1,7 +1,7 @@
 {
   "skip_files": [
     "test/*",
-    "/lib/<%= @application_name %>/tasks.ex"
+    "lib/<%= @application_name %>/tasks.ex"
   ],
   "custom_stop_words": [
     "field",
