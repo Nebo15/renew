@@ -55,6 +55,9 @@ defmodule Mix.Tasks.Renew do
   A `--docs` option will auto-generate API and deployment
   documentation templates.
 
+  A `--repo-slug` option will set GitHub repo slug in app
+  description and docs.
+
   ## Examples
 
       mix renew hello_world
@@ -97,6 +100,7 @@ defmodule Mix.Tasks.Renew do
     umbrella: :boolean,
     app: :string,
     module: :string,
+    repo_slug: :string,
   ]
 
   @spec run(OptionParser.argv) :: :ok
@@ -114,7 +118,8 @@ defmodule Mix.Tasks.Renew do
       docs: opts[:docs] || true,
       ecto_db: opts[:ecto_db] || "postgres",
       phoenix: opts[:phoenix] || false,
-      umbrella: opts[:umbrella] || false
+      umbrella: opts[:umbrella] || false,
+      repo_slug: opts[:repo_slug] || false,
     ]
 
     case argv do
@@ -129,6 +134,10 @@ defmodule Mix.Tasks.Renew do
         check_module_name_validity!(mod)
         check_module_name_availability!(mod)
         check_directory_existence!(app)
+        repo =
+          if opts[:repo_slug],
+            do: "https://github.com/" <> opts[:repo_slug],
+          else: "https://github.com/Nebo15/#{dirname}"
 
         # Create project path
         File.mkdir_p!(path)
@@ -140,6 +149,7 @@ defmodule Mix.Tasks.Renew do
             module_name: mod,
             directory_name: dirname,
             application_name: app,
+            repo: repo,
             in_umbrella: in_umbrella?(path),
             elixir_version: get_version(System.version),
             elixir_minor_version: get_minor_version(System.version),

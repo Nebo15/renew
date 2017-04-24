@@ -2,7 +2,7 @@
   "name": "<%= @module_name %>",
   "description": "Add description to your package.",
   "keywords": ["elixir", "application"],
-  "repository": "https://github.com/Nebo15/<%= @directory_name %>",
+  "repository": "<%= @repo %>",
   "success_url": "/",
   "env": {
     "HOST": {

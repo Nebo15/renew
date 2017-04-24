@@ -4,7 +4,7 @@ defmodule Renew.Generators.Heroku do
   load_templates :tpl, [
     {:cp, "heroku/app.json",                "app.json"},
     {:cp, "heroku/Procfile",                "Procfile"},
-    {:cp, "heroku/README.md",               "README.md"},
+    {:append, "heroku/README.md",           "README.md"},
     {:cp, "heroku/bin/ci/deploy.sh",        "bin/ci/deploy.sh"},
     {:cp, "heroku/elixir_buildpack.config", "elixir_buildpack.config"},
   ]

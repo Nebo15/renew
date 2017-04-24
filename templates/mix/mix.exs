@@ -54,7 +54,7 @@ defmodule <%= @module_name %>.Mixfile do
     [contributors: ["Nebo #15"],
      maintainers: ["Nebo #15"],
      licenses: ["LISENSE.md"],
-     links: %{github: "https://github.com/Nebo15/<%= @directory_name %>"},
+     links: %{github: "<%= @repo %>"},
      files: ~w(lib LICENSE.md mix.exs README.md)]
   end<% end %><%= if @ecto do %>
 

@@ -2,8 +2,7 @@
 
 ### One-click deployment
 
-  1. Review [README.md](README.md) and maybe fix repo path in install button;
-  2. Click on it and use Heroku deployment wizard [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/Nebo15/<%= @directory_name %>).
+  [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=<%= @repo %>)
 
 ### Application Reviews
 
