@@ -1,41 +1,56 @@
 {
-  "name": "Man",
-  "description": "Templates rendering as a service.",
-  "keywords": [
-    "reports",
-    "templates",
-    "email",
-    "sms",
-    "rendering"
-  ],
-  "website": "http://docs.man2.apiary.io/",
-  "repository": "https://github.com/nebo15/man.api",
-  "success_url": "/templates",
+  "name": "<%= @module_name %>",
+  "description": "Add description to your package.",
+  "keywords": ["elixir", "application"],
+  "repository": "https://github.com/Nebo15/<%= @directory_name %>",
+  "success_url": "/",
   "env": {
     "HOST": {
-      "description": "HTTP port for web app to listen on.",
+      "description": "HTTP host for web app to listen on.",
       "value": "localhost"
     },
     "DB_MIGRATE": {
       "description": "Migrate database when container starts.",
+      "required": true,
       "value": "true"
     },
     "SECRET_KEY": {
-      "description": "Phoenix [`:secret_key_base`](https://hexdocs.pm/phoenix/Phoenix.Endpoint.html).",
+      "description": "Phoenix `:secret_key_base`.",
+      "required": true,
       "generator": "secret"
     },
     "ERLANG_COOKIE": {
       "description": "Erlang distribution cookie.",
+      "required": true,
       "generator": "secret"
+    },
+    "MIX_ENV": {
+      "description": "Mix environment to use: test, dev, prod.",
+      "required": true,
+      "value": "prod"
+    }
+  },
+  "environments": {
+    "test": {
+      "env": {
+        "MIX_ENV": "test"
+      }
     }
   },
   "formation": {
     "web": {
       "quantity": 1,
-      "size": "Standard-1X"
+      "size": "free"
     }
   },
-  "image": "nebo15/man",
+  "buildpacks": [
+    {
+      "url": "https://github.com/HashNuke/heroku-buildpack-elixir.git"
+    }
+  ],
+  "scripts": {
+    "postdeploy": "if [[ \"${DB_MIGRATE}\" == \"true\" ]]; then _build/${MIX_ENV}/rel/<%= @application_name %>/bin/<%= @application_name %> command Elixir.<%= @module_name %>.ReleaseTasks migrate!; fi;"
+  },
   "addons": [
     {
       "plan": "heroku-postgresql",

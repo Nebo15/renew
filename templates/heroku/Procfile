@@ -1,0 +1,1 @@
+web: _build/${MIX_ENV}/rel/<%= @application_name %>/bin/<%= @application_name %> foreground
