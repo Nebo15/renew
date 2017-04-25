@@ -29,6 +29,7 @@ OPTIND=1 # Reset in case getopts has been used previously in the shell.
 
 # Default settings
 IS_LATEST=0
+IS_STABLE=0
 
 if git diff-index --quiet HEAD --; then
   PASS_GIT=1
@@ -38,7 +39,7 @@ else
 fi
 
 # Parse ARGS
-while getopts "v:la:ft:" opt; do
+while getopts "v:lsa:ft:" opt; do
   case "$opt" in
     a)  HUB_ACCOUNT=$OPTARG
         ;;
@@ -47,6 +48,8 @@ while getopts "v:la:ft:" opt; do
     t)  REPO_TAG=$OPTARG
         ;;
     l)  IS_LATEST=1
+        ;;
+    s)  IS_STABLE=1
         ;;
     f)  PASS_GIT=1
         ;;
@@ -94,6 +97,11 @@ docker tag "${PROJECT_NAME}:${PROJECT_VERSION}" "${HUB_ACCOUNT}/${PROJECT_NAME}:
 if [ $IS_LATEST == 1 ]; then
   echo "[I] Assigning additional tag '${HUB_ACCOUNT}/${PROJECT_NAME}:latest'.."
   docker tag "${PROJECT_NAME}:${PROJECT_VERSION}" "${HUB_ACCOUNT}/${PROJECT_NAME}:latest"
+fi
+
+if [ $IS_STABLE == 1 ]; then
+  echo "[I] Assigning additional tag '${HUB_ACCOUNT}/${PROJECT_NAME}:stable'.."
+  docker tag "${PROJECT_NAME}:${PROJECT_VERSION}" "${HUB_ACCOUNT}/${PROJECT_NAME}:stable"
 fi
 
 echo "[I] Pushing changes to Docker Hub.."
