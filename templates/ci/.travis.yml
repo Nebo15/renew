@@ -47,9 +47,9 @@ script:<%= if @docker do %>
   # Check code style
   - mix dogma<%= if @docker do %>
   # Build Docker container
-  - ./bin/build.sh
+  - ./bin/build.sh<%= if @ecto do %>
   # Initialize DB for Docker container
-  - MIX_ENV=dev mix ecto.setup
+  - MIX_ENV=dev mix ecto.setup<% end %>
   # Run Docker container
   - sudo ./bin/start.sh
   - sleep 5
