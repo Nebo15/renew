@@ -8,12 +8,12 @@
     "HOST": {
       "description": "HTTP host for web app to listen on.",
       "value": "localhost"
-    },
+    },<%= if @ecto do %>
     "DB_MIGRATE": {
       "description": "Migrate database when container starts.",
       "required": true,
       "value": "true"
-    },
+    },<%= end %>
     "SECRET_KEY": {
       "description": "Phoenix `:secret_key_base`.",
       "required": true,
@@ -47,16 +47,16 @@
     {
       "url": "https://github.com/HashNuke/heroku-buildpack-elixir.git"
     }
-  ],
+  ],<%= if @ecto do %>
   "scripts": {
     "postdeploy": "if [[ \"${DB_MIGRATE}\" == \"true\" ]]; then _build/${MIX_ENV}/rel/<%= @application_name %>/bin/<%= @application_name %> command Elixir.<%= @module_name %>.ReleaseTasks migrate!; fi;"
-  },
-  "addons": [
+  },<%= end %>
+  "addons": [<%= if @ecto do %>
     {
       "plan": "heroku-postgresql",
       "options": {
         "version": "9.5"
       }
     }
-  ]
+  <%= end %>]
 }
