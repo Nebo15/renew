@@ -21,7 +21,7 @@ defmodule Renew.Generators.Mix do
   ]
 
   @deps [
-    ~S({:confex, "~> 1.4"}),
+    ~S({:confex, "~> 2.0"}),
     ~S({:logger_json, "~> 0.4.0"}),
     ~S({:poison, "~> 3.1"}),
   ]
