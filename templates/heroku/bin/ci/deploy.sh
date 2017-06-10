@@ -2,17 +2,8 @@
 # Deploy container to a Heroku.
 # You need to specify $HEROKU_API_KEY secret and $HEROKU_APP_NAME in Travis environment before using this script.
 
-# Find mix.exs inside project tree.
-# This allows to call bash scripts within any folder inside project.
-PROJECT_DIR=$(git rev-parse --show-toplevel)
-if [ ! -f "${PROJECT_DIR}/mix.exs" ]; then
-    echo "[E] Can't find '${PROJECT_DIR}/mix.exs'."
-    echo "    Check that you run this script inside git repo or init a new one in project root."
-fi
-
-# Extract project name and version from mix.exs
-PROJECT_NAME=$(sed -n 's/.*app: :\([^, ]*\).*/\1/pg' "${PROJECT_DIR}/mix.exs")
-PROJECT_VERSION=$(sed -n 's/.*@version "\([^"]*\)".*/\1/pg' "${PROJECT_DIR}/mix.exs")
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source ${DIR}/ci/release/fetch-project-environment.sh
 
 # Adjust project naming for Heroku
 # You may want to set it manually

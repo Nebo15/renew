@@ -1,11 +1,17 @@
 # The directory Mix will write compiled artifacts to.
 _build
 
+# Tests
+test/
+
 # The directory Mix downloads your dependencies sources to.
 deps
 
 # If you run "mix test --cover", coverage assets end up here.
 cover
+
+# Benchmarks
+bench
 
 # If the VM crashes, it generates a dump, let's ignore it too.
 erl_crash.dump
@@ -25,12 +31,11 @@ uploads/*
 Dockerfile
 .dockerignore
 
-# Ignore markdown description
+# Ignore docs
 README.md
 LICENSE.md
-
-# Ignore docs
 *.apib
+docs
 
 # Ignore other CI configuration and scripts
 coveralls.json
@@ -39,4 +44,8 @@ coveralls.json
 bin/ci
 bin/build.sh
 bin/install-git-hooks.sh
+bin/hooks/pre-commit.sh
 bin/start.sh
+elixir_buildpack.config
+Procfile
+app.json

@@ -1,42 +1,53 @@
 language: elixir
-<%= if @docker do %>sudo: required<% end %>
 cache:
   directories:
     - deps
+    - _build
 services:<%= if @docker do %>
-  - docker<% end %><%= if @ecto && @ecto_db == "postgres" do %>
-  - postgresql<% end %><%= if @ecto && @ecto_db == "mysql" do %>
-  - mysql<% end %><%= if @amqp do %>
-  - rabbitmq<% end %><%= if @ecto && @ecto_db == "postgres" do %>
+  - docker<% end %><%= if @amqp do %>
+  - rabbitmq<% end %><%= if @ecto && @ecto_db == "mysql" do %>
+  - mysql<% end %><%= if @ecto && @ecto_db == "postgres" do %>
+  - postgresql
 addons:
   postgresql: "9.5"<% end %>
 elixir:
-  - 1.4.2
+  - 1.4.4
 otp_release:
-  - 19.2
+  - 19.3
 env:
   global:
-    - MIX_ENV=test
+    - MIX_ENV=test<%= if @docker do %>
+    # Set this to `true` if you want to require each commit to be semver-tagged with [major], [minor] or [patch] tags.
+    - REQUIRE_VERSION_TAGS="false"
+    # Main branch that will build new releases by-default
+    - TRUNK_BRANCH="master"
+    # Docker Hub token
     - DOCKER_HUB_ACCOUNT=place_your_account_name_here
-    - MAIN_BRANCHES="master develop staging" # Branches on which you want version to be incremented<%= if @docker do %>
-    - RELEASE_BRANCH="master"<% end %><%= if @docker do %>
-    # Docker and GitHub credentials
-    # - secure: "..."
+    # - secure: "Put your encrypted DockerHub token here"
+    # GitHub token
+    # - secure: "Put your encrypted GitHub token here"<% end %><%= if @heroku do %>
+    # Heroku App name and API token
+    - HEROKU_APP_NAME="<%= @application_name %>"
+    # - secure: "Put your encrypted Heroku token token here"<% end %>
 branches:
   # Releases are generated automatically, stop infinite build loop
   except:
-    - /[0-9]*\.[0-9]*\.[0-9]*/<% end %>
+    - /^[0-9]*\.[0-9]*\.[0-9]*/
 before_install:<%= if @ecto do %>
   # Expose MQ and DB to Docker container
   - sudo ./bin/ci/init-db.sh<% end %><%= if @amqp do %>
   # Expose MQ and DB to Docker container
-  - sudo ./bin/ci/init-mq.sh<% end %>
+  - sudo ./bin/ci/init-mq.sh<% end %><%= if @docker do %>
+before_script:
+  # Extract project name and version from mix.exs
+  - source ./bin/ci/release/fetch-project-environment.sh
+  # Load information about new version
+  - source ./bin/ci/release/fetch-source-version.sh
+  # Load information about changelog
+  - source ./bin/ci/release/fetch-changelog.sh<% end %>
 script:<%= if @docker do %>
   # Increment version in mix.exs
-  # Uncomment this if you want to increment patch version on each Travis build.
-  # - ./bin/ci/version-increment.sh<% end %>
-  # Install dependencies if Travis won't do it by default
-  # - mix deps.get
+  - ./bin/ci/release/put-source-version.sh<% end %>
   # Run all tests except pending ones
   - mix test --exclude pending --trace
   # Submit code coverage report to Coveralls
@@ -47,11 +58,11 @@ script:<%= if @docker do %>
   # Check code style
   - mix dogma<%= if @docker do %>
   # Build Docker container
-  - ./bin/build.sh<%= if @ecto do %>
+  - ./bin/ci/release/build-container.sh<%= if @ecto do %>
   # Initialize DB for Docker container
-  - MIX_ENV=dev mix ecto.setup<% end %>
+  - source .env; PGPASSWORD="${DB_PASSWORD}"; psql -U ${DB_USER} -w -c"CREATE DATABASE ${DB_NAME}"<% end %>
   # Run Docker container
-  - sudo ./bin/start.sh
+  - ./bin/ci/release/start-container.sh
   - sleep 5
   - docker ps
   - RUNNING_CONTAINERS=`docker ps | wc -l`;
@@ -63,7 +74,7 @@ script:<%= if @docker do %>
   # Run acceptance tests on Docker container
   - "CONTAINER_HTTP_HOST=localhost CONTAINER_HTTP_PORT=4000 mix test test/acceptance"
 after_failure:
-  - docker logs <%= @application_name %> --details --since 5h<% end %><%= if @docker do %>
+  - docker logs <%= @application_name %> --details --since 5h
 # Also you can
 # - automatically build images and push them to Docker Hub;
 # - create new git tag with build version and GitHub release on it.
@@ -85,11 +96,12 @@ after_failure:
 # 3. Uncomment following lines:
 #
 # after_success:
-#   # Submit Docker container to Docker Hub and create GitHub Release by pushing tag with changelog
-#   - ./bin/ci/push.sh
+# # Submit Docker container to Docker Hub and create GitHub Release by pushing tag with changelog
+#   - ./bin/ci/release/push-changes.sh
 #
 # 4. If you are using public Travis-CI version it doesn't support deploy keys, so you will need to add a user-token to
-# push script manually.
+# push script manually.<%= if @heroku do %>
+#
 # 5. If you use Heroku Container Engine, you can auto-deploy changes
 # (make sure HEROKU_API_TOKEN secret and HEROKU_APP_NAME env is set):
-#   - ./bin/ci/deploy.sh<% end %>
+#   - ./bin/ci/deploy.sh<% end %><% end %>

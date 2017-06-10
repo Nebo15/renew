@@ -317,7 +317,7 @@ defmodule Mix.Tasks.Renew do
       - Code Coverage, Analysis and Benchmarking tools
       - Setup for Travis-CI Continuous Integration
       - Pre-Commit hooks to keep code clean, run `$ ./bin/install-git-hooks.sh`.<% end %><%= if @docker do %>
-      - Docker container build config and scripts<% end %><%= if @docs do %>
+      - Docker container build config and scripts<% end %><%= if @heroku do %>
       - Heroku auto-deploy scripts, see `./bin/ci/deploy.sh`.<% end %>
     """
     |> EEx.eval_string(assigns: Enum.to_list(opts))
@@ -347,6 +347,8 @@ defmodule Mix.Tasks.Renew do
     You can use "mix" to compile it, test it, and more:
 
         cd #{application_dir}
+        git init<%= if @docker do %>
+        git submodule add -b elixir https://github.com/Nebo15/ci-utils.git bin/ci/release<% end %>
         mix test
 
     Run "mix help" for more commands.
