@@ -35,7 +35,7 @@ defmodule Renew.Generators.Mix do
 
   load_templates :tpl_release, [
     {:cp, "mix/rel/config.exs",            "rel/config.exs"},
-    {:cp, "mix/rel/templates/vm.args.eex", "rel/templates/templates/vm.args.eex"},
+    {:cp, "mix/rel/templates/vm.args.eex", "rel/templates/vm.args.eex"},
   ]
 
   @deps_release [

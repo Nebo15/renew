@@ -186,7 +186,8 @@ defmodule Mix.Tasks.Renew do
         # Print success message
         !!opts[:umbrella]
         |> get_success_message(dirname)
-        |> String.trim_trailing
+        |> EEx.eval_string(assigns: Enum.to_list(opts))
+        |> String.trim_trailing()
         |> Mix.shell.info
     end
   end

@@ -28,7 +28,6 @@ RUN apk del --no-cache make
 RUN set -e; \
     mkdir -p /var/log && \
     mkdir -p $HOME/priv && \
-    mkdir -p $HOME/priv/uploads && \
     mkdir -p /opt/${APP_NAME}/log && \
     mkdir -p /opt/${APP_NAME}/var && \
     mkdir -p /opt/${APP_NAME}/bin/hooks && \
@@ -41,7 +40,6 @@ RUN set -e; \
     rm ${APP_NAME}.tar.gz && \
     rm -rf /opt/app/* && \
     rm -rf /opt/app && \
-    chmod -R 777 /opt/${APP_NAME}/priv/uploads && \
     chmod -R 777 /opt/${APP_NAME}/log && \
     chmod -R 777 /opt/${APP_NAME}/releases && \
     chmod -R 777 /opt/${APP_NAME}/var && \

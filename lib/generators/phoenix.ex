@@ -33,7 +33,7 @@ defmodule Renew.Generators.Phoenix do
     ~S({:httpoison, "~> 0.11.1"}),
     ~S({:phoenix, "~> 1.3.0-rc"}),
     ~S({:multiverse, "~> 0.4.3"}),
-    ~S({:eview, "~> 0.10.1"}),
+    ~S({:eview, "~> 0.12.0"}),
   ]
 
   @deps_ecto [
