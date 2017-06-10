@@ -6,6 +6,7 @@ defmodule Renew.Generators.Ecto do
     {:cp, "ecto/priv/repo/seeds.exs",           "priv/repo/seeds.exs"},
     {:mkdir, "ecto/priv/repo/migrations/",      "priv/repo/migrations/"},
     {:cp, "ecto/priv/repo/migrations/.gitkeep", "priv/repo/migrations/.gitkeep"},
+    {:cp, "ecto/test/unit/repo_test.exs",       "test/unit/repo_test.exs"},
     {:cp, "ecto/test/support/data_case.ex",     "test/support/data_case.ex"},
     {:append, "ecto/.env",                      ".env"},
     {:append, "ecto/bin/hooks/pre-start.sh",    "bin/hooks/pre-start.sh"},
