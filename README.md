@@ -10,7 +10,7 @@ This is a universal project generator that grow out of Nebo #15 requirements:
   - We use Docker since it allows to deploy binaries and run acceptance/performance tests against them in a release cycle.
   - We use Travis-CI to run tests and to build Docker containers.
   - We use Kubernetes clusters with many docker containers inside.
-  - We want Docker containers be as small as possible, Apline Linux is the best for it.
+  - We want Docker containers be as small as possible, Alpine Linux is the best for it.
   - We use Ecto and Phoenix (only in places where we need them), also we use RabbitMQ to guarantee message processing.
 
 So it includes:
